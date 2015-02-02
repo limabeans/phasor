@@ -1,2 +1,2 @@
 # phasor
-phasor animations
+phasor animations.
