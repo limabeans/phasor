@@ -1,6 +1,46 @@
 <!doctype html>
 <html>
   <head>
-    phasors
+    <script type="text/javascript" src="paper-full.min.js"></script>
+    <script type="text/paperscript" canvas="waveCanvas" src="code.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="test/css" href="bootstrap.min.css">
   </head>
+  <body>
+    <div id="adder">
+      add waves here<br>
+      y(x,t) = a sin(kx -+ wt + phi)<br>
+      
+      
+    </div>
+    <br>
+
+    <canvas id="waveCanvas"></canvas>
+
+    <br>
+    <div id="config">
+      <div class="row">
+        <div class="col-md-4">
+	  <form>
+	    <input type="radio" name="phasor" value="nothing">Show nothing</input>
+	    <br>
+	    <input type="radio" name="phasor" value="addition">Vector addition</input>
+	    <br>
+	    <input type="radio" name="phasor" value="origin">Tails at origin</input>
+	  </form>
+	</div>
+        <div class="col-md-4">
+	  <form>
+	    <input type="checkbox" name="wave" value="resultant">Resultant</input>
+	    <br>
+	    <input type="checkbox" name="wave" value="individual">Individual waves</input>
+	  </form>
+	</div>
+        <div class="col-md-4">
+	  <button id="import">Import stuff</button>
+	</div>
+      </div>
+    </div>
+
+  </body>
 </html>

@@ -1,0 +1,19 @@
+#adder {
+    border: 1px solid black;
+}
+#waveCanvas {
+    border: 1px solid black;
+}
+#config {
+    border: 1px solid black;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+
+
+
+
