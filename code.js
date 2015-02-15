@@ -18,7 +18,7 @@ function Wave(a,k,omega,phi,color) {
     this.phi = phi;
     this.w=1;
     this.color = color;
-    this.path = new Path({strokeColor: this.color});
+    this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
