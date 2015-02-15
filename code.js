@@ -18,21 +18,39 @@ function Wave(a,k,omega,phi,color) {
     this.color = color;
     this.path = new Path({strokeColor: this.color});
     
-    this.editAmplitude=function(sliderVal) {
-	this.path.removeSegments();
-	for(var i = 0; i <= pointsPerWave; i++) {
-	    var scaleFraction = i/pointsPerWave;
-	    var deltaX = scaleFraction*oneWavelength;
-	    var sinInput = scaleFraction*(2*Math.PI);
-	    var scaledHeight = maxHeight/maxAmpl;
-	    var deltaY=sliderVal*scaledHeight*Math.sin(sinInput);
-	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
+    this.edit=function(amplSliderVal,phiSliderVal) {
+	if(typeof amplSliderVal!=='undefined') {
+	    this.a = amplSliderVal;
+	    this.path.removeSegments();
+	    for(var i = 0; i <= pointsPerWave; i++) {
+		var scaleFraction = i/pointsPerWave;
+		var deltaX = scaleFraction*oneWavelength;
+		var sinInput = scaleFraction*(2*Math.PI);
+		var scaledHeight = maxHeight/maxAmpl;
+		var deltaY=amplSliderVal*scaledHeight*Math.sin(sinInput+this.phi);
+		this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
+	    }
+	}
+	if(typeof phiSliderVal!=='undefined') {
+	    this.phi = phiSliderVal;
+	    this.path.removeSegments();
+	    for(var i = 0; i <= pointsPerWave; i++) {
+	    	var scaleFraction = i/pointsPerWave;
+	    	var deltaX = scaleFraction*oneWavelength;
+	    	var sinInput = scaleFraction*(2*Math.PI);
+	    	var scaledHeight = maxHeight/maxAmpl;
+	    	var deltaY=this.a*scaledHeight*Math.sin(sinInput+phiSliderVal);
+	    	this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
+
+	    
+	    }
 	}
 	this.path.smooth();
+
     };
     
     //Draw initial wave.
-    this.editAmplitude(1);
+    this.edit(this.a);
 
 };
 
@@ -101,24 +119,19 @@ var midwayLine = new Path.Line({
 
 var amplSlider = document.getElementById('amplitude');
 amplSlider.addEventListener('input', function() {
+    //Editing numerical label here.
     document.getElementById('num').innerHTML=''+amplSlider.value;
-
+    //Editing the actual wave that the user sees.
     var sliderVal = parseFloat(amplSlider.value);
-    wave1.editAmplitude(sliderVal);
+    wave1.edit(sliderVal);
 });
 
 
 var phiSlider = document.getElementById('phi');
 phiSlider.addEventListener('input', function() {
     document.getElementById('num4').innerHTML=''+phiSlider.value;
-    var val = parseFloat(phiSlider.value);
-
-    var phiInterval = (oneWavelength)/(1000);
-    sin.translate([phiInterval,0]);
-    // for(var i=0; i<=100; i++) {
-    // 	var pt=sin.segments[i].point;
-    // 	pt.x+=phiInterval;
-    // }
+    var sliderVal = parseFloat(phiSlider.value);
+    wave1.edit(wave1.a, sliderVal);
 
 });
 
