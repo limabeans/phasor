@@ -79,6 +79,7 @@ var phasorOrigin = new Path.Circle({
     radius:5,
     strokeColor:'purple'
 });
+
 var amplTick = new Path.Line({
     from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
     to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
@@ -150,5 +151,5 @@ function onFrame(event) {
 
 };
 
-var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';
+//var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';
 
