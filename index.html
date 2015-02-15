@@ -10,12 +10,14 @@
     <div id="adder">
       add waves here<br>
       y(x,t) = a sin(kx -+ wt + phi)<br>
-      
+      <label for="amplitude">Amplitude</label>
+      <input type="range" id="amplitude" min="0" max="2" step="0.01" value="1">      
+      <span id="num">0</span>
       
     </div>
     <br>
 
-    <canvas id="waveCanvas"></canvas>
+    <canvas id="waveCanvas" resize="true"></canvas>
 
     <br>
     <div id="config">
@@ -38,6 +40,7 @@
 	</div>
         <div class="col-md-4">
 	  <button id="import">Import stuff</button>
+
 	</div>
       </div>
     </div>
