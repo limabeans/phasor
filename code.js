@@ -9,6 +9,7 @@ var maxAmpl = 2;
 var maxHeight = canvas.height/2;
 var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
+var phasorOriginPoint = new Point(zeroX/2,zeroY);
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
@@ -18,7 +19,7 @@ function Wave(a,k,omega,phi,color) {
     this.w=1;
     this.color = color;
     this.path = new Path({strokeColor: this.color});
-    
+    this.phasor = new Path({strokeColor: this.color, strokeWidth:3});
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
@@ -32,20 +33,27 @@ function Wave(a,k,omega,phi,color) {
 	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
 	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 	}
-
-
 	this.path.smooth();
+	this.editPhasor();
+    };
+    this.editPhasor=function() {
+	this.phasor.removeSegments();
+	var scaledHeight = maxHeight/maxAmpl;
+	var deltaX=scaledHeight*this.a*Math.cos(this.phi);
+	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
+	var offset = new Point(phasorOriginPoint.x+deltaX,
+			      phasorOriginPoint.y-deltaY);
+	this.phasor.add(phasorOriginPoint);
+	this.phasor.add(offset);
 
     };
-    
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi);
+    this.editPhasor();
 
 };
 
 var wave1 = new Wave(1,0,0,0,'blue');
-
-
 
 function onMouseDrag(event) {
     console.log('drag');
@@ -59,19 +67,18 @@ function onMouseDown(event) {
     console.log('down');
 };
 
-var scaleVector = new Point({
-    angle: 45,
-    length: (pixelWavelength/8)*Math.sqrt(2)
-});
-
-
 //Draw lines
-var origin = new Path.Circle({
-    center:[zeroX,zeroY],
-    radius: 20,
-    strokeColor: 'purple'
-});
+// var origin = new Path.Circle({
+//     center:[zeroX,zeroY],
+//     radius: 20,
+//     strokeColor: 'purple'
+// });
 
+var phasorOrigin = new Path.Circle({
+    center:[zeroX/2,zeroY],
+    radius:5,
+    strokeColor:'purple'
+});
 var amplTick = new Path.Line({
     from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
     to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
@@ -87,12 +94,12 @@ var wavelengthTick = new Path.Line({
 var phasorXaxis = new Path.Line({
     from: [0, zeroY],
     to: [canvas.height, zeroY],
-    strokeColor: 'blue'
+    strokeColor: 'black'
 });
 var phasorYaxis = new Path.Line({
     from: [zeroX/2,0],
     to: [zeroX/2,canvas.height],
-    strokeColor: 'blue'
+    strokeColor: 'black'
 });
 
 var dividerLine = new Path.Line({
@@ -144,3 +151,4 @@ function onFrame(event) {
 };
 
 var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';
+
