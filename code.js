@@ -47,14 +47,6 @@ var scaleVector = new Point({
     length: (oneWavelength/4)*Math.sqrt(2)
 });
 
-var sinPath = new Path({strokeColor: 'green'});
-sinPath.segments = [
-    [[zeroX,zeroY],null,scaleVector.rotate(-90)],
-    [[zeroX+oneWavelength/2,zeroY], scaleVector.rotate(-180),scaleVector],
-    [[zeroX+oneWavelength,zeroY],scaleVector.rotate(90),null]
-];
-//sinPath.fullySelected=true;
-
 
 //Draw lines
 var origin = new Path.Circle({
@@ -103,11 +95,6 @@ amplSlider.addEventListener('input', function() {
     document.getElementById('num').innerHTML=''+amplSlider.value;
 
     var val = parseFloat(amplSlider.value);
-//    view.on('frame', function() {
-    for (var i = 0; i < 2; i++) {
-	var curve = sinPath.curves[i];
-	curve.handle1.y=curve.handle2.y= val*canvas.height/4*(i%2 ? 1: -1);
-    }
     sin.removeSegments();
     for(var i = 0; i <= 100; i++) {
 	var sinStep = (2*Math.PI)/100;
