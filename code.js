@@ -19,7 +19,7 @@ function Wave(a,k,omega,phi,color) {
     this.w=1;
     this.color = color;
     this.path = new Path({strokeColor: this.color});
-    this.phasor = new Path({strokeColor: this.color, strokeWidth:3});
+    this.phasor = new Group();
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
@@ -37,15 +37,26 @@ function Wave(a,k,omega,phi,color) {
 	this.editPhasor();
     };
     this.editPhasor=function() {
-	this.phasor.removeSegments();
+	this.phasor.remove();
+	var line = new Path();
 	var scaledHeight = maxHeight/maxAmpl;
 	var deltaX=scaledHeight*this.a*Math.cos(this.phi);
 	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
 	var offset = new Point(phasorOriginPoint.x+deltaX,
 			      phasorOriginPoint.y-deltaY);
-	this.phasor.add(phasorOriginPoint);
-	this.phasor.add(offset);
-
+	line.add(phasorOriginPoint);
+	line.add(offset);
+	var arrowVector = (offset-phasorOriginPoint).normalize(10);
+	this.phasor = new Group([
+	    line,
+	    new Path([
+		offset+arrowVector.rotate(-135),
+		offset,
+		offset+arrowVector.rotate(135)
+	    ])
+	]);
+	this.phasor.strokeColor='blue';
+	this.phasor.strokeWidth=2;
     };
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi);
