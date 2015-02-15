@@ -9,7 +9,16 @@ var oneWavelength = (canvas.width - zeroX)/2;
 var maxAmpl = 2;
 var maxHeight = canvas.height/2;
 
+
 var sin = new Path({ strokeColor: 'blue'});
+
+for(var i = 0; i <= 100; i++) {
+    var sinStep = (2*Math.PI)/100;
+    var sinVar = sinStep * i;
+    var pixelVar = (oneWavelength / 100)*i;
+    var height = canvas.height/2;
+    sin.add(new Point(zeroX+pixelVar, zeroY - (height/maxAmpl)*Math.sin(sinVar)));
+}
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
@@ -92,21 +101,26 @@ var amplSlider = document.getElementById('amplitude');
 console.log(amplSlider);
 amplSlider.addEventListener('input', function() {
     document.getElementById('num').innerHTML=''+amplSlider.value;
-    
+
     var val = parseFloat(amplSlider.value);
 //    view.on('frame', function() {
     for (var i = 0; i < 2; i++) {
 	var curve = sinPath.curves[i];
 	curve.handle1.y=curve.handle2.y= val*canvas.height/4*(i%2 ? 1: -1);
     }
+    sin.removeSegments();
+    for(var i = 0; i <= 100; i++) {
+	var sinStep = (2*Math.PI)/100;
+	var sinVar = sinStep * i;
+	var pixelVar = (oneWavelength / 100)*i;
+	var height = canvas.height/2;
+	sin.add(new Point(zeroX+pixelVar, zeroY - val*(height/maxAmpl)*Math.sin(sinVar)));
+    }
 
 });
-
-
-
-
-
 
 function onFrame(event) {
 
 };
+
+console.log(sin);
