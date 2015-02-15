@@ -5,20 +5,10 @@ canvas.width = window.innerWidth/1.03;
 canvas.height = window.innerHeight/1.4;
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
-var oneWavelength = (canvas.width - zeroX)/2;
+var oneWavelength = (canvas.width - zeroX);
 var maxAmpl = 2;
 var maxHeight = canvas.height/2;
-
-
-var sin = new Path({ strokeColor: 'blue'});
-
-for(var i = 0; i <= 100; i++) {
-    var sinStep = (2*Math.PI)/100;
-    var sinVar = sinStep * i;
-    var pixelVar = (oneWavelength / 100)*i;
-    var height = canvas.height/2;
-    sin.add(new Point(zeroX+pixelVar, zeroY - (height/maxAmpl)*Math.sin(sinVar)));
-}
+var pointsPerWave = 100;
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
@@ -26,8 +16,28 @@ function Wave(a,k,omega,phi,color) {
     this.omega = omega;
     this.phi = phi;
     this.color = color;
+    this.path = new Path({strokeColor: this.color});
     
+    this.editAmplitude=function(sliderVal) {
+	this.path.removeSegments();
+	for(var i = 0; i <= pointsPerWave; i++) {
+	    var scaleFraction = i/pointsPerWave;
+	    var deltaX = scaleFraction*oneWavelength;
+	    var sinInput = scaleFraction*(2*Math.PI);
+	    var scaledHeight = maxHeight/maxAmpl;
+	    var deltaY=sliderVal*scaledHeight*Math.sin(sinInput);
+	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
+	}
+	this.path.smooth();
+    };
+    
+    //Draw initial wave.
+    this.editAmplitude(1);
+
 };
+
+var wave1 = new Wave(1,0,0,0,'blue');
+
 
 
 function onMouseDrag(event) {
@@ -44,7 +54,7 @@ function onMouseDown(event) {
 
 var scaleVector = new Point({
     angle: 45,
-    length: (oneWavelength/4)*Math.sqrt(2)
+    length: (oneWavelength/8)*Math.sqrt(2)
 });
 
 
@@ -62,8 +72,8 @@ var amplTick = new Path.Line({
 });
 
 var wavelengthTick = new Path.Line({
-    from: [zeroX + oneWavelength, -10 + zeroY],
-    to: [zeroX + oneWavelength ,10 + zeroY],
+    from: [zeroX + oneWavelength/2, -10 + zeroY],
+    to: [zeroX + oneWavelength/2 ,10 + zeroY],
     strokeColor: 'red'
     
 });
@@ -90,24 +100,30 @@ var midwayLine = new Path.Line({
 });
 
 var amplSlider = document.getElementById('amplitude');
-console.log(amplSlider);
 amplSlider.addEventListener('input', function() {
     document.getElementById('num').innerHTML=''+amplSlider.value;
 
-    var val = parseFloat(amplSlider.value);
-    sin.removeSegments();
-    for(var i = 0; i <= 100; i++) {
-	var sinStep = (2*Math.PI)/100;
-	var sinVar = sinStep * i;
-	var pixelVar = (oneWavelength / 100)*i;
-	var height = canvas.height/2;
-	sin.add(new Point(zeroX+pixelVar, zeroY - val*(height/maxAmpl)*Math.sin(sinVar)));
-    }
+    var sliderVal = parseFloat(amplSlider.value);
+    wave1.editAmplitude(sliderVal);
+});
+
+
+var phiSlider = document.getElementById('phi');
+phiSlider.addEventListener('input', function() {
+    document.getElementById('num4').innerHTML=''+phiSlider.value;
+    var val = parseFloat(phiSlider.value);
+
+    var phiInterval = (oneWavelength)/(1000);
+    sin.translate([phiInterval,0]);
+    // for(var i=0; i<=100; i++) {
+    // 	var pt=sin.segments[i].point;
+    // 	pt.x+=phiInterval;
+    // }
 
 });
+
 
 function onFrame(event) {
 
 };
 
-console.log(sin);
