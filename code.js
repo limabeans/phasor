@@ -1,13 +1,13 @@
-console.log('ran code.js');
 //Global variables.
 var canvas = document.getElementById("waveCanvas");
-canvas.width = window.innerWidth/1.03;
-canvas.height = window.innerHeight/1.4;
+//canvas.width = window.innerWidth/1.03;
+//canvas.height = window.innerHeight/1.4;
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
-var oneWavelength = (canvas.width - zeroX);
+var pixelWavelength = (canvas.width - zeroX);
 var maxAmpl = 2;
 var maxHeight = canvas.height/2;
+var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
 
 function Wave(a,k,omega,phi,color) {
@@ -15,42 +15,31 @@ function Wave(a,k,omega,phi,color) {
     this.k = k;
     this.omega = omega;
     this.phi = phi;
+    this.w=1;
     this.color = color;
     this.path = new Path({strokeColor: this.color});
     
-    this.edit=function(amplSliderVal,phiSliderVal) {
-	if(typeof amplSliderVal!=='undefined') {
-	    this.a = amplSliderVal;
-	    this.path.removeSegments();
-	    for(var i = 0; i <= pointsPerWave; i++) {
-		var scaleFraction = i/pointsPerWave;
-		var deltaX = scaleFraction*oneWavelength;
-		var sinInput = scaleFraction*(2*Math.PI);
-		var scaledHeight = maxHeight/maxAmpl;
-		var deltaY=amplSliderVal*scaledHeight*Math.sin(sinInput+this.phi);
-		this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
-	    }
+    this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
+	this.a = amplSliderVal;
+	this.w = wavelengthSliderVal;
+	this.phi = phiSliderVal;
+	this.path.removeSegments();
+	for(var i = 0; i <= pointsPerWave; i++) {
+	    var scaleFraction = i/pointsPerWave;
+	    var deltaX = scaleFraction*pixelWavelength;
+	    var sinInput = this.w*scaleFraction*(2*Math.PI);
+	    var scaledHeight = maxHeight/maxAmpl;
+	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
+	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 	}
-	if(typeof phiSliderVal!=='undefined') {
-	    this.phi = phiSliderVal;
-	    this.path.removeSegments();
-	    for(var i = 0; i <= pointsPerWave; i++) {
-	    	var scaleFraction = i/pointsPerWave;
-	    	var deltaX = scaleFraction*oneWavelength;
-	    	var sinInput = scaleFraction*(2*Math.PI);
-	    	var scaledHeight = maxHeight/maxAmpl;
-	    	var deltaY=this.a*scaledHeight*Math.sin(sinInput+phiSliderVal);
-	    	this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 
-	    
-	    }
-	}
+
 	this.path.smooth();
 
     };
     
     //Draw initial wave.
-    this.edit(this.a);
+    this.edit(this.a,this.w,this.phi);
 
 };
 
@@ -72,7 +61,7 @@ function onMouseDown(event) {
 
 var scaleVector = new Point({
     angle: 45,
-    length: (oneWavelength/8)*Math.sqrt(2)
+    length: (pixelWavelength/8)*Math.sqrt(2)
 });
 
 
@@ -90,8 +79,8 @@ var amplTick = new Path.Line({
 });
 
 var wavelengthTick = new Path.Line({
-    from: [zeroX + oneWavelength/2, -10 + zeroY],
-    to: [zeroX + oneWavelength/2 ,10 + zeroY],
+    from: [zeroX + pixelWavelength/2, -10 + zeroY],
+    to: [zeroX + pixelWavelength/2 ,10 + zeroY],
     strokeColor: 'red'
     
 });
@@ -123,15 +112,29 @@ amplSlider.addEventListener('input', function() {
     document.getElementById('num').innerHTML=''+amplSlider.value;
     //Editing the actual wave that the user sees.
     var sliderVal = parseFloat(amplSlider.value);
-    wave1.edit(sliderVal);
+    wave1.edit(sliderVal,wave1.w,wave1.phi);
 });
 
+
+var wavelengthSlider = document.getElementById('wavelength');
+wavelengthSlider.addEventListener('input', function() {
+    document.getElementById('num2').innerHTML=''+wavelengthSlider.value;
+    var sliderVal = parseFloat(wavelengthSlider.value);
+    wave1.edit(wave1.a, sliderVal, wave1.phi);
+});
+
+// var kSlider = document.getElementById('k');
+// kSlider.addEventListener('input', function() {
+//     document.getElementById('num2').innerHTML=''+kSlider.value;
+//     var sliderVal = parseFloat(kSlider.value);
+// });
+// document.getElementById('pixelWavelength').innerHTML=''+wavelength;
 
 var phiSlider = document.getElementById('phi');
 phiSlider.addEventListener('input', function() {
     document.getElementById('num4').innerHTML=''+phiSlider.value;
     var sliderVal = parseFloat(phiSlider.value);
-    wave1.edit(wave1.a, sliderVal);
+    wave1.edit(wave1.a, wave1.w, sliderVal);
 
 });
 
@@ -140,3 +143,4 @@ function onFrame(event) {
 
 };
 
+var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';

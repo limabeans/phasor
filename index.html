@@ -8,10 +8,15 @@
   </head>
   <body>
     <div id="adder">
-      add waves here<br>
       y(x,t) = a sin(kx -+ wt + phi)<br>
       <label for="amplitude">Amplitude</label>: <span id="num">1</span><br>
-      <input type="range" id="amplitude" min="0" max="2" step="0.01" value="1"></input>      
+      <input type="range" id="amplitude" min="0" max="2" step="0.01" value="1"></input>
+
+      <label for="wavelength">Wavelengths</label>: <span id="num2">1</span>
+      <input type="range" id="wavelength" min=".5" max="10" step=".1" value="1"></input>
+
+      <!-- <label for="k">k</label>: <span id="num2">0</span> / wavelength: <span id="pixelWavelength">unknown</span> -->
+      <!-- <input class="sliders" type="range" id="k" min="-2" max="2" step="0.01" value="0"></input> -->
 
       <label for="phi">phi</label>: <span id="num4">0</span>
       <input class="sliders" type="range" id="phi" min="-6.283" max="6.283" step="0.01" value="0"></input>
