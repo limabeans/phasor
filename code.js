@@ -10,6 +10,7 @@ var maxHeight = canvas.height/2;
 var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
+var velocityOfMedium = 343;
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
@@ -129,6 +130,7 @@ var amplSlider = document.getElementById('amplitude');
 amplSlider.addEventListener('input', function() {
     //Editing numerical label here.
     document.getElementById('num').innerHTML=''+amplSlider.value;
+    document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
     //Editing the actual wave that the user sees.
     var sliderVal = parseFloat(amplSlider.value);
     wave1.edit(sliderVal,wave1.w,wave1.phi);
@@ -139,6 +141,15 @@ var wavelengthSlider = document.getElementById('wavelength');
 wavelengthSlider.addEventListener('input', function() {
     document.getElementById('num2').innerHTML=''+wavelengthSlider.value;
     var sliderVal = parseFloat(wavelengthSlider.value);
+    var k = 2*Math.PI/sliderVal;
+    k = parseFloat(k).toFixed(2);
+    var w = 2*Math.PI*velocityOfMedium/sliderVal;
+    w = parseFloat(w).toFixed(2);
+    document.getElementById('wave_k').innerHTML=''+k;
+    document.getElementById('wave_w').innerHTML=''+w;
+    document.getElementById('wave_k2').innerHTML=''+k;
+    document.getElementById('wave_w2').innerHTML=''+w;
+
     wave1.edit(wave1.a, sliderVal, wave1.phi);
 });
 
@@ -152,6 +163,7 @@ wavelengthSlider.addEventListener('input', function() {
 var phiSlider = document.getElementById('phi');
 phiSlider.addEventListener('input', function() {
     document.getElementById('num4').innerHTML=''+phiSlider.value;
+    document.getElementById('wave_phi').innerHTML=''+phiSlider.value;
     var sliderVal = parseFloat(phiSlider.value);
     wave1.edit(wave1.a, wave1.w, sliderVal);
 
