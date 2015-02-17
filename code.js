@@ -10,7 +10,7 @@ var maxHeight = canvas.height/2;
 var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
-var velocityOfMedium = 343;
+var velocityOfMedium = 10;
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
