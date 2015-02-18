@@ -28,10 +28,16 @@ function Wave(a,k,omega,phi,color) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
 	this.phi = phiSliderVal;
+	
+	this.k=2*Math.PI/this.w;
+	this.omega=velocityOfMedium*this.k;
+	
 	this.path.removeSegments();
 	for(var i = 0; i <= pointsPerWave; i++) {
 	    var scaleFraction = i/pointsPerWave;
 	    var deltaX = scaleFraction*pixelWavelength;
+	    //var sinInput = scaleFraction*(2*Math.PI)/this.w;
+	    //sinInput = kx = (2pi/lambda)*x
 	    var sinInput = this.w*scaleFraction*(2*Math.PI);
 	    var scaledHeight = maxHeight/maxAmpl;
 	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
@@ -179,9 +185,9 @@ function onFrame(event) {
     if(play) {
 	//Checking if the dropdown button is + or -
 	if(!reverseFlag) {
-	    wave1.phi+=timeStep;
-	} else {
 	    wave1.phi-=timeStep;
+	} else {
+	    wave1.phi+=timeStep;
 	}
 	
 	wave1.edit(wave1.a,wave1.w,wave1.phi);
@@ -202,10 +208,7 @@ var speedSlider = document.getElementById('speed');
 console.log(speedSlider);
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
-    console.log(speedVal);
     speedVal = parseFloat(speedVal);
-    console.log(speedVal);
-    //timeStep=speedVal;
     timeStep=speedVal;
     
 });
