@@ -36,6 +36,7 @@ function Wave(a,k,omega,phi,color) {
 	    var scaledHeight = maxHeight/maxAmpl;
 	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
 	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
+
 	}
 	this.path.smooth();
 	this.editPhasor();
@@ -47,11 +48,8 @@ function Wave(a,k,omega,phi,color) {
 	var deltaX=scaledHeight*this.a*Math.cos(this.phi);
 	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
 	var offset = new Point(phasorOriginPoint.x+deltaX,
-			      phasorOriginPoint.y-deltaY);
-	if(reverseFlag) {
-	    offset = new Point(phasorOriginPoint.x+deltaX,
-			       phasorOriginPoint.y+deltaY);
-	}
+			       phasorOriginPoint.y-deltaY);
+	
 	line.add(phasorOriginPoint);
 	line.add(offset);
 	var arrowVector = (offset-phasorOriginPoint).normalize(10);
@@ -179,7 +177,13 @@ phiSlider.addEventListener('input', function() {
 
 function onFrame(event) {
     if(play) {
-	wave1.phi+=timeStep;
+	//Checking if the dropdown button is + or -
+	if(!reverseFlag) {
+	    wave1.phi+=timeStep;
+	} else {
+	    wave1.phi-=timeStep;
+	}
+	
 	wave1.edit(wave1.a,wave1.w,wave1.phi);
     }
 };
