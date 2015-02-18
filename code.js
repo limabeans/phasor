@@ -11,6 +11,9 @@ var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
+var timeStep = 0.01;
+var reverseFlag=false;
+var play=false;
 
 function Wave(a,k,omega,phi,color) {
     this.a = a;
@@ -45,6 +48,10 @@ function Wave(a,k,omega,phi,color) {
 	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
 	var offset = new Point(phasorOriginPoint.x+deltaX,
 			      phasorOriginPoint.y-deltaY);
+	if(reverseFlag) {
+	    offset = new Point(phasorOriginPoint.x+deltaX,
+			       phasorOriginPoint.y+deltaY);
+	}
 	line.add(phasorOriginPoint);
 	line.add(offset);
 	var arrowVector = (offset-phasorOriginPoint).normalize(10);
@@ -171,8 +178,37 @@ phiSlider.addEventListener('input', function() {
 
 
 function onFrame(event) {
-
+    if(play) {
+	wave1.phi+=timeStep;
+	wave1.edit(wave1.a,wave1.w,wave1.phi);
+    }
 };
 
+var playButton = document.getElementById('play');
+playButton.addEventListener('click', function() {
+    play=!play;
+    if(playButton.innerHTML === 'Play') {
+	playButton.innerHTML = 'Pause';
+    } else {
+	playButton.innerHTML = 'Play';
+    }
+});
+
+var speedSlider = document.getElementById('speed');
+console.log(speedSlider);
+speedSlider.addEventListener('input', function() {
+    var speedVal = speedSlider.value;
+    console.log(speedVal);
+    speedVal = parseFloat(speedVal);
+    console.log(speedVal);
+    //timeStep=speedVal;
+    timeStep=speedVal;
+    
+});
 //var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';
 
+var directionDropdown = document.getElementById('dir');
+console.log(directionDropdown);
+directionDropdown.addEventListener('change', function() {
+    reverseFlag=!reverseFlag;
+});
