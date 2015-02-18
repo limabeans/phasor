@@ -36,8 +36,9 @@ function Wave(a,k,omega,phi,color) {
 	for(var i = 0; i <= pointsPerWave; i++) {
 	    var scaleFraction = i/pointsPerWave;
 	    var deltaX = scaleFraction*pixelWavelength;
-	    //var sinInput = scaleFraction*(2*Math.PI)/this.w;
-	    //sinInput = kx = (2pi/lambda)*x
+	    //Scaling on the fraction to find out "where I am" on the
+	    // wavelength, and then finding out where I am on the 2pi
+	    //unit circle.
 	    var sinInput = this.w*scaleFraction*(2*Math.PI);
 	    var scaledHeight = maxHeight/maxAmpl;
 	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
