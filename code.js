@@ -7,12 +7,13 @@ var zeroY = canvas.height/2;
 var pixelWavelength = (canvas.width - zeroX);
 var maxAmpl = 2;
 var maxHeight = canvas.height/2;
+//wavelength = ratio of y_max/w_max
 var wavelength = pixelWavelength/maxHeight;
+var maxWavelength = wavelength*maxAmpl;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
 var timeStep = 0.0001;
-var reverseFlag=false;
 var play=false;
 var wavesArray=[];
 
@@ -36,7 +37,7 @@ var refreshWaveDiv = function() {
 function Wave(a,k,omega,phi,color,d) {
     this.a = a;
     this.a_span = null;
-    this.k = k;
+    this.lambda = maxWavelength / 1;
     this.k_span = null;
     this.omega = 62.83;
     this.omega_span = null;
@@ -54,8 +55,6 @@ function Wave(a,k,omega,phi,color,d) {
 	this.w = wavelengthSliderVal;
 	this.phi = phiSliderVal;
 	
-	this.k=2*Math.PI/this.w;
-	this.omega=velocityOfMedium*this.k;
 	
 	this.path.removeSegments();
 	for(var i = 0; i <= pointsPerWave; i++) {
@@ -209,26 +208,27 @@ function Wave(a,k,omega,phi,color,d) {
 	});
 	sliders.appendChild(a_slider);
 
-	var lambda = document.createElement('span');
-	lambda.innerHTML = '&lambda;';
-	sliders.appendChild(lambda);
+	var num_wavelengths = document.createElement('span');
+	num_wavelengths.innerHTML = 'num of wavelengths';
+	sliders.appendChild(num_wavelengths);
 
-	var lambda_slider = document.createElement('input');
-	lambda_slider.type='range';
-	lambda_slider.className='sliders';
-	lambda_slider.min='.5';
-	lambda_slider.max='10';
-	lambda_slider.step='.1';
-	lambda_slider.value='1';
-	lambda_slider.addEventListener('input', function() {
-	    var k_tmp = 2*Math.PI/lambda_slider.value;
+	var num_wavelengths_slider = document.createElement('input');
+	num_wavelengths_slider.type='range';
+	num_wavelengths_slider.className='sliders';
+	num_wavelengths_slider.min='.5';
+	num_wavelengths_slider.max='10';
+	num_wavelengths_slider.step='.1';
+	num_wavelengths_slider.value='1';
+	num_wavelengths_slider.addEventListener('input', function() {
+	    waveObj.lambda = maxWavelength/num_wavelengths_slider.value;
+	    var k_tmp = 2*Math.PI/waveObj.lambda;
 	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(2);
-	    var omega_tmp = 2*Math.PI*velocityOfMedium/lambda_slider.value;
+	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
 	    waveObj.omega=omega_tmp;
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
-	    waveObj.edit(waveObj.a, lambda_slider.value, waveObj.phi);
+	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi);
 	});
-	sliders.appendChild(lambda_slider);
+	sliders.appendChild(num_wavelengths_slider);
 
 	var phi = document.createElement('span');
 	phi.innerHTML='&phi;';
