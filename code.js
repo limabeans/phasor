@@ -209,7 +209,7 @@ function Wave(a,k,omega,phi,color,d) {
 	sliders.appendChild(a_slider);
 
 	var num_wavelengths = document.createElement('span');
-	num_wavelengths.innerHTML = 'num of wavelengths';
+	num_wavelengths.innerHTML = 'f';
 	sliders.appendChild(num_wavelengths);
 
 	var num_wavelengths_slider = document.createElement('input');
