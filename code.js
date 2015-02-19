@@ -35,6 +35,7 @@ var refreshWaveDiv = function() {
 
 function Wave(a,k,omega,phi,color,d) {
     this.a = a;
+    this.a_span = null;
     this.k = k;
     this.omega = omega;
     this.phi = phi;
@@ -131,7 +132,7 @@ function Wave(a,k,omega,phi,color,d) {
 	return select;
     };
 
-    this.createWaveEqn = function() {
+    this.createWaveEqn = function(waveObj) {
 	//[color] y(x,t)=[1.00]sin([6.28]x [-+] [62.83]t + [0])
 	var eqn = document.createElement('span');
 	//y(x,t) =
@@ -139,6 +140,7 @@ function Wave(a,k,omega,phi,color,d) {
 	eqn.appendChild(y_x_t);
 	//[1.00]
 	var ampl_span = document.createElement('span');
+	waveObj.a_span=ampl_span;
 	ampl_span.innerHTML = '1.00';
 	eqn.appendChild(ampl_span);
 	//sin(
@@ -177,7 +179,7 @@ function Wave(a,k,omega,phi,color,d) {
 	return eqn;
     };
 
-    this.createWaveSlidersDOM = function() {
+    this.createWaveSlidersDOM = function(waveObj) {
 	var sliders = document.createElement('span');
 	var alpha = document.createElement('span');
 	alpha.innerHTML='&alpha;';
@@ -189,6 +191,11 @@ function Wave(a,k,omega,phi,color,d) {
 	a_slider.min='0';
 	a_slider.max='2';
 	a_slider.step='0.01';
+	a_slider.addEventListener('input', function() {
+	    waveObj.a=a_slider.value;
+	    waveObj.a_span.innerHTML=''+a_slider.value;
+	    waveObj.refresh();
+	});
 	sliders.appendChild(a_slider);
 
 	var lambda = document.createElement('span');
@@ -226,10 +233,10 @@ function Wave(a,k,omega,phi,color,d) {
     this.createWaveDOM = function() {
 	var wave = document.createElement('div');
 	var colorDropdown = this.createColorDropdown(this);
-	var eqn = this.createWaveEqn();
+	var eqn = this.createWaveEqn(this);
 	var newline = document.createElement('span');
 	newline.innerHTML='<br>';
-	var sliders = this.createWaveSlidersDOM();
+	var sliders = this.createWaveSlidersDOM(this);
 	wave.appendChild(colorDropdown);
 	wave.appendChild(eqn);
 	wave.appendChild(newline);
