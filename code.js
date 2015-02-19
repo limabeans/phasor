@@ -24,6 +24,7 @@ function Wave(a,k,omega,phi,color) {
     this.color = color;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
+
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
@@ -68,9 +69,18 @@ function Wave(a,k,omega,phi,color) {
 		offset+arrowVector.rotate(135)
 	    ])
 	]);
-	this.phasor.strokeColor='blue';
+	this.phasor.strokeColor=this.color;
 	this.phasor.strokeWidth=2;
     };
+    
+    this.refresh = function() {
+	this.path.remove();
+    	this.path = new Path({strokeColor: this.color, strokeWidth:1});
+	this.phasor.remove();
+    	this.phasor=new Group();
+    	this.edit(this.a, this.w, this.phi);
+    };
+
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi);
     this.editPhasor();
@@ -219,4 +229,11 @@ var directionDropdown = document.getElementById('dir');
 console.log(directionDropdown);
 directionDropdown.addEventListener('change', function() {
     reverseFlag=!reverseFlag;
+});
+
+
+var colorDropdown = document.getElementById('color');
+colorDropdown.addEventListener('change', function() {
+    wave1.color = colorDropdown.value;
+    wave1.refresh();
 });

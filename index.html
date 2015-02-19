@@ -4,23 +4,27 @@
     <script type="text/javascript" src="paper-full.min.js"></script>
     <script type="text/paperscript" canvas="waveCanvas" src="code.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <!-- <link rel="stylesheet" type="test/css" href="bootstrap.min.css"> -->
+    <!-- x<link rel="stylesheet" type="test/css" href="bootstrap.min.css"> -->
   </head>
   <body>
-    <div id="adder">
+    <div class="center" id="adder">
       <h3>y(x,t) = <span id="wave_amp">1</span>sin(<span id="wave_k">6.28</span>x <select id="dir"><option value="-">-</option><option value="+">+</option></select> <span id="wave_w">62.83</span>t + <span id="wave_phi">0</span>)</h3>
       <h4>velocity = w / k = <span id="wave_w2">62.83</span> / <span id="wave_k2">6.28</span> = 10 m/s ...<i>some fictitious medium!</i></h4>
       <button id="play">Play</button> <input class="sliders" type="range" id="speed" min="0" max=".4" step="0.01" value=".1"></input>
-      <label for="amplitude">Amplitude</label>: <span id="num">1</span>
+      <label for="amplitude">Amplitude</label>: <span class="vals" id="num">1</span>
       <input type="range" id="amplitude" min="0" max="2" step="0.01" value="1"></input>
-      <label for="wavelength">Wavelengths</label>: <span id="num2">1</span>
+      <label for="wavelength">Wavelengths</label>: <span class="vals" id="num2">1</span>
       <input type="range" id="wavelength" min=".5" max="10" step=".1" value="1"></input>
 
-      <!-- <label for="k">k</label>: <span id="num2">0</span> / wavelength: <span id="pixelWavelength">unknown</span> -->
-      <!-- <input class="sliders" type="range" id="k" min="-2" max="2" step="0.01" value="0"></input> -->
-
-      <label for="phi">phi (-2pi to 2pi)</label>: <span id="num4">0</span>
+      <label for="phi">phi (-2pi to 2pi)</label>: <span class="vals" id="num4">0</span>
       <input class="sliders" type="range" id="phi" min="-6.283" max="6.283" step="0.01" value="0"></input>
+      <select id="color">
+	<option value="blue">Blue</option>
+	<option value="green">Green</option>
+	<option value="red">Red</option>
+	<option value="orange">Orange</option>
+	<option value="purple">Purple</option>
+      </select>
       
     </div>
     <br>
@@ -28,8 +32,7 @@
     <canvas id="waveCanvas" resize="true" keepalive="true"></canvas>
 
     <br>
-    NONE OF THESE BUTTONS BELOW WORK YET
-    <div id="config">
+    <div class="center" id="config">
       <div class="row">
         <div class="col-md-4">
 	  <form>
