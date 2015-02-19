@@ -165,6 +165,10 @@ function Wave(a,k,omega,phi,color,d) {
 	var plus = document.createElement('option');
 	plus.text='+'; plus.value='+';
 	dir_dropdown.add(plus);
+	dir_dropdown.addEventListener('change', function() {
+	    waveObj.dir=dir_dropdown.value;
+	    console.log(waveObj.dir=dir_dropdown.value);
+	});
 	eqn.appendChild(dir_dropdown);
 	//[62.83]
 	var omega_span = document.createElement('span');
@@ -363,9 +367,15 @@ var midwayLine = new Path.Line({
 function onFrame(event) {
     if(play) {
 	for(var i = 0; i <wavesArray.length; i++) {
-	    wavesArray[i].phi -= timeStep;
-	    wavesArray[i].edit(wavesArray[i].a,
-			       wavesArray[i].w,wavesArray[i].phi);
+	    if(wavesArray[i].dir==='-') {
+		wavesArray[i].phi -= timeStep;
+		wavesArray[i].edit(wavesArray[i].a,
+				   wavesArray[i].w,wavesArray[i].phi);
+	    } else {
+		wavesArray[i].phi += timeStep;
+		wavesArray[i].edit(wavesArray[i].a,
+				   wavesArray[i].w,wavesArray[i].phi);
+	    }
 	}
     }
 };
@@ -390,7 +400,4 @@ speedSlider.addEventListener('input', function() {
     timeStep=speedVal;
     
 });
-
-
-
 
