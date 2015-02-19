@@ -151,7 +151,6 @@ var midwayLine = new Path.Line({
 var amplSlider = document.getElementById('amplitude');
 amplSlider.addEventListener('input', function() {
     //Editing numerical label here.
-    document.getElementById('num').innerHTML=''+amplSlider.value;
     document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
     //Editing the actual wave that the user sees.
     var sliderVal = parseFloat(amplSlider.value);
@@ -161,7 +160,6 @@ amplSlider.addEventListener('input', function() {
 
 var wavelengthSlider = document.getElementById('wavelength');
 wavelengthSlider.addEventListener('input', function() {
-    document.getElementById('num2').innerHTML=''+wavelengthSlider.value;
     var sliderVal = parseFloat(wavelengthSlider.value);
     var k = 2*Math.PI/sliderVal;
     k = parseFloat(k).toFixed(2);
@@ -169,24 +167,15 @@ wavelengthSlider.addEventListener('input', function() {
     w = parseFloat(w).toFixed(2);
     document.getElementById('wave_k').innerHTML=''+k;
     document.getElementById('wave_w').innerHTML=''+w;
-    document.getElementById('wave_k2').innerHTML=''+k;
-    document.getElementById('wave_w2').innerHTML=''+w;
 
     wave1.edit(wave1.a, sliderVal, wave1.phi);
 });
 
-// var kSlider = document.getElementById('k');
-// kSlider.addEventListener('input', function() {
-//     document.getElementById('num2').innerHTML=''+kSlider.value;
-//     var sliderVal = parseFloat(kSlider.value);
-// });
-// document.getElementById('pixelWavelength').innerHTML=''+wavelength;
-
 var phiSlider = document.getElementById('phi');
 phiSlider.addEventListener('input', function() {
-    document.getElementById('num4').innerHTML=''+phiSlider.value;
-    document.getElementById('wave_phi').innerHTML=''+phiSlider.value;
     var sliderVal = parseFloat(phiSlider.value);
+    var wave_phi = document.getElementById('wave_phi');
+    wave_phi.innerHTML= ''+sliderVal;
     wave1.edit(wave1.a, wave1.w, sliderVal);
 
 });
@@ -216,9 +205,11 @@ playButton.addEventListener('click', function() {
 });
 
 var speedSlider = document.getElementById('speed');
-console.log(speedSlider);
+var speed_val = document.getElementById('speed_val');
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
+    var scaled = parseFloat(speedVal*10).toFixed(1);
+    speed_val.innerHTML=''+scaled;
     speedVal = parseFloat(speedVal);
     timeStep=speedVal;
     
@@ -237,3 +228,6 @@ colorDropdown.addEventListener('change', function() {
     wave1.color = colorDropdown.value;
     wave1.refresh();
 });
+
+
+
