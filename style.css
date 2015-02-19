@@ -41,3 +41,8 @@ select {
 #speed {
     width: 100px;
 }
+
+#waveCanvas {
+    width:100%;
+}
+
