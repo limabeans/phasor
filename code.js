@@ -364,6 +364,8 @@ var midwayLine = new Path.Line({
 //     wave1.refresh();
 // });
 
+var resultant = new Path({strokeColor:'black', strokeWidth:2});
+
 function onFrame(event) {
     if(play) {
 	for(var i = 0; i <wavesArray.length; i++) {
@@ -375,6 +377,24 @@ function onFrame(event) {
 		wavesArray[i].phi += timeStep;
 		wavesArray[i].edit(wavesArray[i].a,
 				   wavesArray[i].w,wavesArray[i].phi);
+	    }
+	    //console.log(wavesArray[i].path.segments[0].point);
+	}
+	//resultant
+	resultant.removeSegments();
+	if(wavesArray.length>0) {
+
+	    for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
+		var resultant_x=0;
+		var resultant_y=0;
+		for(var s = 0; s < wavesArray.length; s++) {
+		    resultant_x=wavesArray[0].path.segments[i].point.x;
+
+		    resultant_y = resultant_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+		    
+		}
+		
+		resultant.add(new Point(resultant_x, zeroY-resultant_y));
 	    }
 	}
     }
