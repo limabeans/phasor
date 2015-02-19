@@ -14,6 +14,24 @@ var velocityOfMedium = 10;
 var timeStep = 0.01;
 var reverseFlag=false;
 var play=false;
+var wavesArray=[];
+
+var addWaveButton = document.getElementById('add_wave');
+var waveEquationsDiv = document.getElementById('adder');
+addWaveButton.addEventListener('click', function() {
+    wavesArray.push(new Wave(1,0,0,0,'blue','-'));
+    refreshWaveDiv();
+});
+
+var refreshWaveDiv = function() {
+    //Clear it up.
+    while (waveEquationsDiv.hasChildNodes()) {
+	waveEquationsDiv.removeChild(waveEquationsDiv.lastChild);
+    }
+    for(var i = 0; i < wavesArray.length; i++) {
+	waveEquationsDiv.appendChild(wavesArray[i].waveDOM);
+    }
+};
 
 function Wave(a,k,omega,phi,color,d) {
     this.a = a;
@@ -26,7 +44,6 @@ function Wave(a,k,omega,phi,color,d) {
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
 
-    
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
@@ -84,32 +101,152 @@ function Wave(a,k,omega,phi,color,d) {
     	this.edit(this.a, this.w, this.phi);
     };
 
+
+    this.createColorDropdown = function(waveObj) {
+	var select = document.createElement('select');
+	var blue = document.createElement('option');
+	blue.text='Blue';
+	blue.value='blue';
+	var green = document.createElement('option');
+	green.text='Green';
+	green.value='green';
+	var red = document.createElement('option');
+	red.text='Red';
+	red.value='red';
+	var orange = document.createElement('option');
+	orange.text='Orange';
+	orange.value='orange';
+	var purple = document.createElement('option');
+	purple.text='Purple';
+	purple.value='purple';
+	select.add(blue);
+	select.add(green);
+	select.add(red);
+	select.add(orange);
+	select.add(purple);
+	select.addEventListener('change', function() {
+	    waveObj.color=select.value;
+	    waveObj.refresh();
+	});
+	return select;
+    };
+
+    this.createWaveEqn = function() {
+	//[color] y(x,t)=[1.00]sin([6.28]x [-+] [62.83]t + [0])
+	var eqn = document.createElement('span');
+	//y(x,t) =
+	var y_x_t = document.createTextNode('y(x,t) = ');
+	eqn.appendChild(y_x_t);
+	//[1.00]
+	var ampl_span = document.createElement('span');
+	ampl_span.innerHTML = '1.00';
+	eqn.appendChild(ampl_span);
+	//sin(
+	var sin_txt = document.createTextNode('sin(');
+	eqn.appendChild(sin_txt);
+	//[6.28]
+	var k_span = document.createElement('span');
+	k_span.innerHTML='6.28';
+	eqn.appendChild(k_span);
+	//x
+	var x_txt = document.createTextNode('x ');
+	eqn.appendChild(x_txt);
+	//[-+]
+	var dir_dropdown = document.createElement('select');
+	var minus = document.createElement('option');
+	minus.text='-'; minus.value='-';
+	dir_dropdown.add(minus);
+	var plus = document.createElement('option');
+	plus.text='+'; plus.value='+';
+	dir_dropdown.add(plus);
+	eqn.appendChild(dir_dropdown);
+	//[62.83]
+	var omega_span = document.createElement('span');
+	omega_span.innerHTML='62.83';
+	eqn.appendChild(omega_span);
+	//t +
+	var t_plus_txt = document.createTextNode('t + ');
+	eqn.appendChild(t_plus_txt);
+	//[0]
+	var phi_span = document.createElement('span');
+	phi_span.innerHTML = '0';
+	eqn.appendChild(phi_span);
+	//)
+	var end_paren_txt = document.createTextNode(')');
+	eqn.appendChild(end_paren_txt);
+	return eqn;
+    };
+
+    this.createWaveSlidersDOM = function() {
+	var sliders = document.createElement('span');
+	var alpha = document.createElement('span');
+	alpha.innerHTML='&alpha;';
+	sliders.appendChild(alpha);
+
+	var a_slider = document.createElement('input');
+	a_slider.type='range';
+	a_slider.className='sliders'; 
+	a_slider.min='0';
+	a_slider.max='2';
+	a_slider.step='0.01';
+	sliders.appendChild(a_slider);
+
+	var lambda = document.createElement('span');
+	lambda.innerHTML = '&lambda;';
+	sliders.appendChild(lambda);
+
+	var lambda_slider = document.createElement('input');
+	lambda_slider.type='range';
+	lambda_slider.className='sliders';
+	lambda_slider.min='.5';
+	lambda_slider.max='10';
+	lambda_slider.step='.1';
+	lambda_slider.value='1';
+	sliders.appendChild(lambda_slider);
+
+	var phi = document.createElement('span');
+	phi.innerHTML='&phi;';
+	sliders.appendChild(phi);
+
+	var phi_slider = document.createElement('input');
+	phi_slider.type='range';
+	phi_slider.className='sliders';
+	phi_slider.min='-6.283';
+	phi_slider.max='6.283';
+	phi_slider.step='0.01';
+	phi_slider.value='0';
+	sliders.appendChild(phi_slider);
+	phi_slider.addEventListener('input', function() {
+	    console.log(this.value);
+	});
+	return sliders;
+    };
+
+
+    this.createWaveDOM = function() {
+	var wave = document.createElement('div');
+	var colorDropdown = this.createColorDropdown(this);
+	var eqn = this.createWaveEqn();
+	var newline = document.createElement('span');
+	newline.innerHTML='<br>';
+	var sliders = this.createWaveSlidersDOM();
+	wave.appendChild(colorDropdown);
+	wave.appendChild(eqn);
+	wave.appendChild(newline);
+	wave.appendChild(sliders);
+	return wave;
+    };
+
+
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi);
     this.editPhasor();
+    this.waveDOM = this.createWaveDOM();
+    //waveEquationsDiv.appendChild(this.waveDOM);
 
 };
 
 //var wave1 = new Wave(1,0,0,0,'blue','-');
-
-function onMouseDrag(event) {
-    console.log('drag');
-};
-
-function onMouseUp(event) {
-    console.log('up');
-};
-
-function onMouseDown(event) {
-    console.log('down');
-};
-
-//Draw lines
-// var origin = new Path.Circle({
-//     center:[zeroX,zeroY],
-//     radius: 20,
-//     strokeColor: 'purple'
-// });
 
 var phasorOrigin = new Path.Circle({
     center:[zeroX/2,zeroY],
@@ -237,143 +374,5 @@ speedSlider.addEventListener('input', function() {
 });
 
 
-var createColorDropdown = function() {
-    var select = document.createElement('select');
-    var blue = document.createElement('option');
-    blue.text='Blue';
-    blue.value='blue';
-    var green = document.createElement('option');
-    green.text='Green';
-    green.value='green';
-    var red = document.createElement('option');
-    red.text='Red';
-    red.value='red';
-    var orange = document.createElement('option');
-    orange.text='Orange';
-    orange.value='orange';
-    var purple = document.createElement('option');
-    purple.text='Purple';
-    purple.value='purple';
-    select.add(blue);
-    select.add(green);
-    select.add(red);
-    select.add(orange);
-    select.add(purple);
-    select.addEventListener('change', function() {
-	alert(this.value);
-    });
-    return select;
-};
 
-var createWaveEqn = function() {
-    //[color] y(x,t)=[1.00]sin([6.28]x [-+] [62.83]t + [0])
-    var eqn = document.createElement('span');
-    //y(x,t) =
-    var y_x_t = document.createTextNode('y(x,t) = ');
-    eqn.appendChild(y_x_t);
-    //[1.00]
-    var ampl_span = document.createElement('span');
-    ampl_span.innerHTML = '1.00';
-    eqn.appendChild(ampl_span);
-    //sin(
-    var sin_txt = document.createTextNode('sin(');
-    eqn.appendChild(sin_txt);
-    //[6.28]
-    var k_span = document.createElement('span');
-    k_span.innerHTML='6.28';
-    eqn.appendChild(k_span);
-    //x
-    var x_txt = document.createTextNode('x ');
-    eqn.appendChild(x_txt);
-    //[-+]
-    var dir_dropdown = document.createElement('select');
-    var minus = document.createElement('option');
-    minus.text='-'; minus.value='-';
-    dir_dropdown.add(minus);
-    var plus = document.createElement('option');
-    plus.text='+'; plus.value='+';
-    dir_dropdown.add(plus);
-    eqn.appendChild(dir_dropdown);
-    //[62.83]
-    var omega_span = document.createElement('span');
-    omega_span.innerHTML='62.83';
-    eqn.appendChild(omega_span);
-    //t +
-    var t_plus_txt = document.createTextNode('t + ');
-    eqn.appendChild(t_plus_txt);
-    //[0]
-    var phi_span = document.createElement('span');
-    phi_span.innerHTML = '0';
-    eqn.appendChild(phi_span);
-    //)
-    var end_paren_txt = document.createTextNode(')');
-    eqn.appendChild(end_paren_txt);
-    return eqn;
-};
 
-var createWaveSlidersDOM = function() {
-    var sliders = document.createElement('span');
-    var alpha = document.createElement('span');
-    alpha.innerHTML='&alpha;';
-    sliders.appendChild(alpha);
-
-    var a_slider = document.createElement('input');
-    a_slider.type='range';
-    a_slider.className='sliders'; 
-    a_slider.min='0';
-    a_slider.max='2';
-    a_slider.step='0.01';
-    sliders.appendChild(a_slider);
-
-    var lambda = document.createElement('span');
-    lambda.innerHTML = '&lambda;';
-    sliders.appendChild(lambda);
-
-    var lambda_slider = document.createElement('input');
-    lambda_slider.type='range';
-    lambda_slider.className='sliders';
-    lambda_slider.min='.5';
-    lambda_slider.max='10';
-    lambda_slider.step='.1';
-    lambda_slider.value='1';
-    sliders.appendChild(lambda_slider);
-
-    var phi = document.createElement('span');
-    phi.innerHTML='&phi;';
-    sliders.appendChild(phi);
-
-    var phi_slider = document.createElement('input');
-    phi_slider.type='range';
-    phi_slider.className='sliders';
-    phi_slider.min='-6.283';
-    phi_slider.max='6.283';
-    phi_slider.step='0.01';
-    phi_slider.value='0';
-    sliders.appendChild(phi_slider);
-    phi_slider.addEventListener('input', function() {
-	console.log(this.value);
-    });
-    return sliders;
-};
-
-var createWaveDOM = function() {
-    var wave = document.createElement('div');
-    var colorDropdown = createColorDropdown();
-    var eqn = createWaveEqn();
-    var newline = document.createElement('span');
-    newline.innerHTML='<br>';
-    var sliders = createWaveSlidersDOM();
-    wave.appendChild(colorDropdown);
-    wave.appendChild(eqn);
-    wave.appendChild(newline);
-    wave.appendChild(sliders);
-    return wave;
-};
-
-var addWaveButton = document.getElementById('add_wave');
-var waveEquationsDiv = document.getElementById('adder');
-addWaveButton.addEventListener('click', function() {
-    var wave = createWaveDOM();
-    waveEquationsDiv.appendChild(wave);
-    var wave1 = new Wave(1,0,0,0,'blue','-');
-});
