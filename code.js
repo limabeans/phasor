@@ -236,5 +236,97 @@ colorDropdown.addEventListener('change', function() {
     wave1.refresh();
 });
 
+var testfunc = function() {
+    this.value = 'rekt';
+};
 
+var createColorDropdown = function() {
+    var select = document.createElement('select');
+    var blue = document.createElement('option');
+    blue.text='Blue';
+    blue.value='blue';
+    var green = document.createElement('option');
+    green.text='Green';
+    green.value='green';
+    var red = document.createElement('option');
+    red.text='Red';
+    red.value='red';
+    var orange = document.createElement('option');
+    orange.text='Orange';
+    orange.value='orange';
+    var purple = document.createElement('option');
+    purple.text='Purple';
+    purple.value='purple';
+    select.add(blue);
+    select.add(green);
+    select.add(red);
+    select.add(orange);
+    select.add(purple);
+    select.addEventListener('change', function() {
+	alert(this.value);
+    });
+    return select;
+};
 
+var createWaveEqn = function() {
+    //[color] y(x,t)=[1.00]sin([6.28]x [-+] [62.83]t + [0])
+    var eqn = document.createElement('span');
+    //y(x,t) =
+    var y_x_t = document.createTextNode('y(x,t) = ');
+    eqn.appendChild(y_x_t);
+    //[1.00]
+    var ampl_span = document.createElement('span');
+    ampl_span.innerHTML = '1.00';
+    eqn.appendChild(ampl_span);
+    //sin(
+    var sin_txt = document.createTextNode('sin(');
+    eqn.appendChild(sin_txt);
+    //[6.28]
+    var k_span = document.createElement('span');
+    k_span.innerHTML='6.28';
+    eqn.appendChild(k_span);
+    //x
+    var x_txt = document.createTextNode('x ');
+    eqn.appendChild(x_txt);
+    //[-+]
+    var dir_dropdown = document.createElement('select');
+    var minus = document.createElement('option');
+    minus.text='-'; minus.value='-';
+    dir_dropdown.add(minus);
+    var plus = document.createElement('option');
+    plus.text='+'; plus.value='+';
+    dir_dropdown.add(plus);
+    eqn.appendChild(dir_dropdown);
+    //[62.83]
+    var omega_span = document.createElement('span');
+    omega_span.innerHTML='62.83';
+    eqn.appendChild(omega_span);
+    //t +
+    var t_plus_txt = document.createTextNode('t + ');
+    eqn.appendChild(t_plus_txt);
+    //[0]
+    var phi_span = document.createElement('span');
+    phi_span.innerHTML = '0';
+    eqn.appendChild(phi_span);
+    //)
+    var end_paren_txt = document.createTextNode(')');
+    eqn.appendChild(end_paren_txt);
+    return eqn;
+};
+
+var createWaveDOM = function() {
+    var wave = document.createElement('div');
+    var colorDropdown = createColorDropdown();
+    var eqn = createWaveEqn();
+    wave.appendChild(colorDropdown);
+    wave.appendChild(eqn);
+    return wave;
+};
+
+var count = 0;
+var testzone = document.getElementById('testzone');
+var testbutton = document.getElementById('testbutton');
+testbutton.addEventListener('click', function() {
+    var node = createWaveDOM();
+    testzone.appendChild(node);
+});
