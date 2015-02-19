@@ -20,7 +20,9 @@ var wavesArray=[];
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
 addWaveButton.addEventListener('click', function() {
-    wavesArray.push(new Wave(1,6.28,62.83,0,'blue','-'));
+    var k = Math.PI*2/1;
+    var w = Math.PI*2*velocityOfMedium/1;
+    wavesArray.push(new Wave(1,k,w,0,'blue','-'));
     refreshWaveDiv();
 });
 
@@ -39,7 +41,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.a_span = null;
     this.lambda = maxWavelength / 1;
     this.k_span = null;
-    this.omega = 62.83;
+    this.omega = Math.PI*2*velocityOfMedium/1;
     this.omega_span = null;
     this.phi = phi;
     this.phi_span = null;
@@ -224,7 +226,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    var k_tmp = 2*Math.PI/waveObj.lambda;
 	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(2);
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
-	    waveObj.omega=omega_tmp;
+	    waveObj.omega=omega_tmp; //I actually changed omega value here.
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
 	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi);
 	});
@@ -367,7 +369,7 @@ var midwayLine = new Path.Line({
 // });
 
 var resultant = new Path({strokeColor:'black', strokeWidth:2});
-
+var resultantPhasor = new Path({strokeColor: 'black', strokeWidth:3});
 function onFrame(event) {
     if(play) {
 	for(var i = 0; i <wavesArray.length; i++) {
@@ -381,7 +383,6 @@ function onFrame(event) {
 		wavesArray[i].edit(wavesArray[i].a,
 				   wavesArray[i].w,wavesArray[i].phi);
 	    }
-	    //console.log(wavesArray[i].path.segments[0].point);
 	}
 	//resultant
 	resultant.removeSegments();
@@ -399,6 +400,8 @@ function onFrame(event) {
 		
 		resultant.add(new Point(resultant_x, zeroY-resultant_y));
 		resultant.smooth();
+		//console.log(wavesArray[0].phasor.children[0]);
+
 	    }
 	}
     }
