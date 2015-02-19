@@ -11,7 +11,7 @@ var wavelength = pixelWavelength/maxHeight;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
-var timeStep = 0.01;
+var timeStep = 0.0001;
 var reverseFlag=false;
 var play=false;
 var wavesArray=[];
@@ -19,7 +19,7 @@ var wavesArray=[];
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
 addWaveButton.addEventListener('click', function() {
-    wavesArray.push(new Wave(1,0,0,0,'blue','-'));
+    wavesArray.push(new Wave(1,6.28,62.83,0,'blue','-'));
     refreshWaveDiv();
 });
 
@@ -38,7 +38,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.a_span = null;
     this.k = k;
     this.k_span = null;
-    this.omega = omega;
+    this.omega = 62.83;
     this.omega_span = null;
     this.phi = phi;
     this.phi_span = null;
@@ -167,13 +167,14 @@ function Wave(a,k,omega,phi,color,d) {
 	dir_dropdown.add(plus);
 	dir_dropdown.addEventListener('change', function() {
 	    waveObj.dir=dir_dropdown.value;
-	    console.log(waveObj.dir=dir_dropdown.value);
 	});
 	eqn.appendChild(dir_dropdown);
 	//[62.83]
 	var omega_span = document.createElement('span');
 	omega_span.innerHTML='62.83';
 	waveObj.omega_span=omega_span;
+	//NaN bug here???
+	//waveObj.omega=omega_span.value;
 	eqn.appendChild(omega_span);
 	//t +
 	var t_plus_txt = document.createTextNode('t + ');
@@ -223,6 +224,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    var k_tmp = 2*Math.PI/lambda_slider.value;
 	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(2);
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/lambda_slider.value;
+	    waveObj.omega=omega_tmp;
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
 	    waveObj.edit(waveObj.a, lambda_slider.value, waveObj.phi);
 	});
@@ -369,12 +371,13 @@ var resultant = new Path({strokeColor:'black', strokeWidth:2});
 function onFrame(event) {
     if(play) {
 	for(var i = 0; i <wavesArray.length; i++) {
+	    var omega = parseFloat(wavesArray[i].omega);
 	    if(wavesArray[i].dir==='-') {
-		wavesArray[i].phi -= timeStep;
+		wavesArray[i].phi -= omega*timeStep;
 		wavesArray[i].edit(wavesArray[i].a,
 				   wavesArray[i].w,wavesArray[i].phi);
 	    } else {
-		wavesArray[i].phi += timeStep;
+		wavesArray[i].phi += omega*timeStep;
 		wavesArray[i].edit(wavesArray[i].a,
 				   wavesArray[i].w,wavesArray[i].phi);
 	    }
@@ -395,6 +398,7 @@ function onFrame(event) {
 		}
 		
 		resultant.add(new Point(resultant_x, zeroY-resultant_y));
+		resultant.smooth();
 	    }
 	}
     }
@@ -414,7 +418,8 @@ var speedSlider = document.getElementById('speed');
 var speed_val = document.getElementById('speed_val');
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
-    var scaled = parseFloat(speedVal*10).toFixed(1);
+    console.log(speedVal);
+    var scaled = parseFloat(speedVal*1000).toFixed(1);
     speed_val.innerHTML=''+scaled;
     speedVal = parseFloat(speedVal);
     timeStep=speedVal;
