@@ -26,6 +26,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
 
+    
+
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
@@ -88,7 +90,7 @@ function Wave(a,k,omega,phi,color,d) {
 
 };
 
-var wave1 = new Wave(1,0,0,0,'blue','-');
+//var wave1 = new Wave(1,0,0,0,'blue','-');
 
 function onMouseDrag(event) {
     console.log('drag');
@@ -149,38 +151,56 @@ var midwayLine = new Path.Line({
     strokeColor: 'black'
 });
 
-var amplSlider = document.getElementById('amplitude');
-amplSlider.addEventListener('input', function() {
-    //Editing numerical label here.
-    document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
-    //Editing the actual wave that the user sees.
-    var sliderVal = parseFloat(amplSlider.value);
-    wave1.edit(sliderVal,wave1.w,wave1.phi,wave1.dir);
-});
+// var amplSlider = document.getElementById('amplitude');
+// amplSlider.addEventListener('input', function() {
+//     //Editing numerical label here.
+//     document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
+//     //Editing the actual wave that the user sees.
+//     var sliderVal = parseFloat(amplSlider.value);
+//     wave1.edit(sliderVal,wave1.w,wave1.phi,wave1.dir);
+// });
 
 
-var wavelengthSlider = document.getElementById('wavelength');
-wavelengthSlider.addEventListener('input', function() {
-    var sliderVal = parseFloat(wavelengthSlider.value);
-    var k = 2*Math.PI/sliderVal;
-    k = parseFloat(k).toFixed(2);
-    var w = 2*Math.PI*velocityOfMedium/sliderVal;
-    w = parseFloat(w).toFixed(2);
-    document.getElementById('wave_k').innerHTML=''+k;
-    document.getElementById('wave_w').innerHTML=''+w;
+// var wavelengthSlider = document.getElementById('wavelength');
+// wavelengthSlider.addEventListener('input', function() {
+//     var sliderVal = parseFloat(wavelengthSlider.value);
+//     var k = 2*Math.PI/sliderVal;
+//     k = parseFloat(k).toFixed(2);
+//     var w = 2*Math.PI*velocityOfMedium/sliderVal;
+//     w = parseFloat(w).toFixed(2);
+//     document.getElementById('wave_k').innerHTML=''+k;
+//     document.getElementById('wave_w').innerHTML=''+w;
 
-    wave1.edit(wave1.a, sliderVal, wave1.phi, wave1.dir);
-});
+//     wave1.edit(wave1.a, sliderVal, wave1.phi, wave1.dir);
+// });
 
-var phiSlider = document.getElementById('phi');
-phiSlider.addEventListener('input', function() {
-    var sliderVal = parseFloat(phiSlider.value);
-    var wave_phi = document.getElementById('wave_phi');
-    wave_phi.innerHTML= ''+sliderVal;
-    wave1.edit(wave1.a, wave1.w, sliderVal, wave1.dir);
+// var phiSlider = document.getElementById('phi');
+// phiSlider.addEventListener('input', function() {
+//     var sliderVal = parseFloat(phiSlider.value);
+//     var wave_phi = document.getElementById('wave_phi');
+//     wave_phi.innerHTML= ''+sliderVal;
+//     wave1.edit(wave1.a, wave1.w, sliderVal, wave1.dir);
 
-});
+// });
 
+// var directionDropdown = document.getElementById('dir');
+// console.log(directionDropdown);
+// directionDropdown.addEventListener('change', function() {
+//     reverseFlag=!reverseFlag;
+
+//     if(wave1.dir==='-') {
+// 	wave1.dir='+';
+//     } else {
+// 	wave1.dir='-';
+//     }
+// });
+
+
+// var colorDropdown = document.getElementById('color');
+// colorDropdown.addEventListener('change', function() {
+//     wave1.color = colorDropdown.value;
+//     wave1.refresh();
+// });
 
 function onFrame(event) {
     if(play) {
@@ -215,30 +235,7 @@ speedSlider.addEventListener('input', function() {
     timeStep=speedVal;
     
 });
-//var cc = new Path.Circle(view.center, 3); cc.strokeColor='green';
 
-var directionDropdown = document.getElementById('dir');
-console.log(directionDropdown);
-directionDropdown.addEventListener('change', function() {
-    reverseFlag=!reverseFlag;
-
-    if(wave1.dir==='-') {
-	wave1.dir='+';
-    } else {
-	wave1.dir='-';
-    }
-});
-
-
-var colorDropdown = document.getElementById('color');
-colorDropdown.addEventListener('change', function() {
-    wave1.color = colorDropdown.value;
-    wave1.refresh();
-});
-
-var testfunc = function() {
-    this.value = 'rekt';
-};
 
 var createColorDropdown = function() {
     var select = document.createElement('select');
@@ -353,6 +350,9 @@ var createWaveSlidersDOM = function() {
     phi_slider.step='0.01';
     phi_slider.value='0';
     sliders.appendChild(phi_slider);
+    phi_slider.addEventListener('input', function() {
+	console.log(this.value);
+    });
     return sliders;
 };
 
@@ -370,10 +370,10 @@ var createWaveDOM = function() {
     return wave;
 };
 
-var count = 0;
-var testzone = document.getElementById('testzone');
-var testbutton = document.getElementById('testbutton');
-testbutton.addEventListener('click', function() {
-    var node = createWaveDOM();
-    testzone.appendChild(node);
+var addWaveButton = document.getElementById('add_wave');
+var waveEquationsDiv = document.getElementById('adder');
+addWaveButton.addEventListener('click', function() {
+    var wave = createWaveDOM();
+    waveEquationsDiv.appendChild(wave);
+    var wave1 = new Wave(1,0,0,0,'blue','-');
 });
