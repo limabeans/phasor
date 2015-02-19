@@ -362,14 +362,11 @@ var midwayLine = new Path.Line({
 
 function onFrame(event) {
     if(play) {
-	//Checking if the dropdown button is + or -
-	if(wave1.dir === '-') {
-	    wave1.phi-=timeStep;
-	} else { //wave1.dir === '+'
-	    wave1.phi+=timeStep;
+	for(var i = 0; i <wavesArray.length; i++) {
+	    wavesArray[i].phi -= timeStep;
+	    wavesArray[i].edit(wavesArray[i].a,
+			       wavesArray[i].w,wavesArray[i].phi);
 	}
-	
-	wave1.edit(wave1.a,wave1.w,wave1.phi);
     }
 };
 
