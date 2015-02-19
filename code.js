@@ -314,12 +314,59 @@ var createWaveEqn = function() {
     return eqn;
 };
 
+var createWaveSlidersDOM = function() {
+    var sliders = document.createElement('span');
+    var alpha = document.createElement('span');
+    alpha.innerHTML='&alpha;';
+    sliders.appendChild(alpha);
+
+    var a_slider = document.createElement('input');
+    a_slider.type='range';
+    a_slider.className='sliders'; 
+    a_slider.min='0';
+    a_slider.max='2';
+    a_slider.step='0.01';
+    sliders.appendChild(a_slider);
+
+    var lambda = document.createElement('span');
+    lambda.innerHTML = '&lambda;';
+    sliders.appendChild(lambda);
+
+    var lambda_slider = document.createElement('input');
+    lambda_slider.type='range';
+    lambda_slider.className='sliders';
+    lambda_slider.min='.5';
+    lambda_slider.max='10';
+    lambda_slider.step='.1';
+    lambda_slider.value='1';
+    sliders.appendChild(lambda_slider);
+
+    var phi = document.createElement('span');
+    phi.innerHTML='&phi;';
+    sliders.appendChild(phi);
+
+    var phi_slider = document.createElement('input');
+    phi_slider.type='range';
+    phi_slider.className='sliders';
+    phi_slider.min='-6.283';
+    phi_slider.max='6.283';
+    phi_slider.step='0.01';
+    phi_slider.value='0';
+    sliders.appendChild(phi_slider);
+    return sliders;
+};
+
 var createWaveDOM = function() {
     var wave = document.createElement('div');
     var colorDropdown = createColorDropdown();
     var eqn = createWaveEqn();
+    var newline = document.createElement('span');
+    newline.innerHTML='<br>';
+    var sliders = createWaveSlidersDOM();
     wave.appendChild(colorDropdown);
     wave.appendChild(eqn);
+    wave.appendChild(newline);
+    wave.appendChild(sliders);
     return wave;
 };
 

@@ -26,6 +26,11 @@ select::-ms-expand {
 }
 
 
+.sliders {
+    width: 80px;
+}
+
+
 #amplitude {
     width: 80px;
 }
