@@ -7,10 +7,21 @@
     <!-- x<link rel="stylesheet" type="test/css" href="bootstrap.min.css"> -->
   </head>
   <body>
+    <button id="play">Play</button> <input class="sliders" type="range" id="speed" min="0" max=".4" step="0.01" value=".1"></input>
+    <select id="phasor_tails">
+      <option value="0">Tails at origin</option>
+      <option value="1">Vector addition</option>
+    </select>
+    <select id="wave_option">
+      <option value="0">Show all</option>
+      <option value="1">Resultant only</option>
+      <option value="2">Individual only</option>
+    </select>
     <div class="center" id="adder">
-      <h3>y(x,t) = <span id="wave_amp">1</span>sin(<span id="wave_k">6.28</span>x <select id="dir"><option value="-">-</option><option value="+">+</option></select> <span id="wave_w">62.83</span>t + <span id="wave_phi">0</span>)</h3>
-      <h4>velocity = w / k = <span id="wave_w2">62.83</span> / <span id="wave_k2">6.28</span> = 10 m/s ...<i>some fictitious medium!</i></h4>
-      <button id="play">Play</button> <input class="sliders" type="range" id="speed" min="0" max=".4" step="0.01" value=".1"></input>
+
+      y(x,t) = <span id="wave_amp">1</span>sin(<span id="wave_k">6.28</span>x <select id="dir"><option value="-">-</option><option value="+">+</option></select> <span id="wave_w">62.83</span>t + <span id="wave_phi">0</span>)
+
+
       <label for="amplitude">Amplitude</label>: <span class="vals" id="num">1</span>
       <input type="range" id="amplitude" min="0" max="2" step="0.01" value="1"></input>
       <label for="wavelength">Wavelengths</label>: <span class="vals" id="num2">1</span>
@@ -31,31 +42,6 @@
 
     <canvas id="waveCanvas" resize="true" keepalive="true"></canvas>
 
-    <br>
-    <div class="center" id="config">
-      <div class="row">
-        <div class="col-md-4">
-	  <form>
-	    <input type="radio" name="phasor" value="nothing">Show nothing</input>
-	    <br>
-	    <input type="radio" name="phasor" value="addition">Vector addition</input>
-	    <br>
-	    <input type="radio" name="phasor" value="origin">Tails at origin</input>
-	  </form>
-	</div>
-        <div class="col-md-4">
-	  <form>
-	    <input type="checkbox" name="wave" value="resultant">Resultant</input>
-	    <br>
-	    <input type="checkbox" name="wave" value="individual">Individual waves</input>
-	  </form>
-	</div>
-        <div class="col-md-4">
-	  <button id="import">Import stuff</button>
-
-	</div>
-      </div>
-    </div>
 
   </body>
 </html>
