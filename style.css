@@ -27,23 +27,23 @@ select::-ms-expand {
 
 
 #amplitude {
-    width: 100px;
+    width: 80px;
 }
 
 #wavelength {
-    width: 100px;
+    width: 80px;
 }
 
 #phi {
-    width: 100px;
+    width: 80px;
 }
 
 #speed {
-    width: 100px;
+    width: 80px;
 }
 
 #waveCanvas {
-    width: 100%;
+    width: 75%;
 }
 
 .center {

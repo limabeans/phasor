@@ -15,13 +15,14 @@ var timeStep = 0.01;
 var reverseFlag=false;
 var play=false;
 
-function Wave(a,k,omega,phi,color) {
+function Wave(a,k,omega,phi,color,d) {
     this.a = a;
     this.k = k;
     this.omega = omega;
     this.phi = phi;
     this.w=1;
     this.color = color;
+    this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
 
@@ -87,7 +88,7 @@ function Wave(a,k,omega,phi,color) {
 
 };
 
-var wave1 = new Wave(1,0,0,0,'blue');
+var wave1 = new Wave(1,0,0,0,'blue','-');
 
 function onMouseDrag(event) {
     console.log('drag');
@@ -154,7 +155,7 @@ amplSlider.addEventListener('input', function() {
     document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
     //Editing the actual wave that the user sees.
     var sliderVal = parseFloat(amplSlider.value);
-    wave1.edit(sliderVal,wave1.w,wave1.phi);
+    wave1.edit(sliderVal,wave1.w,wave1.phi,wave1.dir);
 });
 
 
@@ -168,7 +169,7 @@ wavelengthSlider.addEventListener('input', function() {
     document.getElementById('wave_k').innerHTML=''+k;
     document.getElementById('wave_w').innerHTML=''+w;
 
-    wave1.edit(wave1.a, sliderVal, wave1.phi);
+    wave1.edit(wave1.a, sliderVal, wave1.phi, wave1.dir);
 });
 
 var phiSlider = document.getElementById('phi');
@@ -176,7 +177,7 @@ phiSlider.addEventListener('input', function() {
     var sliderVal = parseFloat(phiSlider.value);
     var wave_phi = document.getElementById('wave_phi');
     wave_phi.innerHTML= ''+sliderVal;
-    wave1.edit(wave1.a, wave1.w, sliderVal);
+    wave1.edit(wave1.a, wave1.w, sliderVal, wave1.dir);
 
 });
 
@@ -184,9 +185,9 @@ phiSlider.addEventListener('input', function() {
 function onFrame(event) {
     if(play) {
 	//Checking if the dropdown button is + or -
-	if(!reverseFlag) {
+	if(wave1.dir === '-') {
 	    wave1.phi-=timeStep;
-	} else {
+	} else { //wave1.dir === '+'
 	    wave1.phi+=timeStep;
 	}
 	
@@ -220,6 +221,12 @@ var directionDropdown = document.getElementById('dir');
 console.log(directionDropdown);
 directionDropdown.addEventListener('change', function() {
     reverseFlag=!reverseFlag;
+
+    if(wave1.dir==='-') {
+	wave1.dir='+';
+    } else {
+	wave1.dir='-';
+    }
 });
 
 
