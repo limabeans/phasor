@@ -41,6 +41,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.omega = omega;
     this.omega_span = null;
     this.phi = phi;
+    this.phi_span = null;
     this.w=1;
     this.color = color;
     this.dir=d;
@@ -176,6 +177,7 @@ function Wave(a,k,omega,phi,color,d) {
 	//[0]
 	var phi_span = document.createElement('span');
 	phi_span.innerHTML = '0';
+	waveObj.phi_span=phi_span;
 	eqn.appendChild(phi_span);
 	//)
 	var end_paren_txt = document.createTextNode(')');
@@ -219,7 +221,6 @@ function Wave(a,k,omega,phi,color,d) {
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/lambda_slider.value;
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
 	    waveObj.edit(waveObj.a, lambda_slider.value, waveObj.phi);
-	    console.log(lambda_slider.value);
 	});
 	sliders.appendChild(lambda_slider);
 
@@ -236,7 +237,8 @@ function Wave(a,k,omega,phi,color,d) {
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
 	phi_slider.addEventListener('input', function() {
-	    console.log(this.value);
+	    waveObj.phi_span.innerHTML=''+phi_slider.value;
+	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value));
 	});
 	return sliders;
     };
