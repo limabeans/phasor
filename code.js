@@ -88,17 +88,18 @@ function Wave(a,k,omega,phi,color,d) {
 	
 	line.add(phasorOriginPoint);
 	line.add(offset);
-	var arrowVector = (offset-phasorOriginPoint).normalize(10);
-	this.phasor = new Group([
-	    line,
-	    new Path([
-		offset+arrowVector.rotate(-135),
-		offset,
-		offset+arrowVector.rotate(135)
-	    ])
-	]);
-	this.phasor.strokeColor=this.color;
-	this.phasor.strokeWidth=2;
+	this.phasor = drawArrow(line,offset,this.color,2);
+	// var arrowVector = (offset-phasorOriginPoint).normalize(10);
+	// this.phasor = new Group([
+	//     line,
+	//     new Path([
+	// 	offset+arrowVector.rotate(-135),
+	// 	offset,
+	// 	offset+arrowVector.rotate(135)
+	//     ])
+	// ]);
+	// this.phasor.strokeColor=this.color;
+	// this.phasor.strokeWidth=2;
     };
     
     this.refresh = function() {
@@ -321,7 +322,7 @@ var midwayLine = new Path.Line({
 });
 
 var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
-var resultantPhasor = new Path({strokeColor: 'black', strokeWidth:3});
+var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
 
 function onFrame(event) {
     if(play) {
@@ -355,18 +356,35 @@ function onFrame(event) {
 	}
 
 	//resultantPhasor
-	resultantPhasor.removeSegments();
-	resultantPhasor.add(phasorOriginPoint);
+	resultantPhasor.remove();
+	var line = new Path();
+	line.add(phasorOriginPoint);
 	var resultant_dX=0;
 	var resultant_dY=0;
 	for(var i=0; i < wavesArray.length; i++) {
 	    resultant_dX+=wavesArray[i].dX;
 	    resultant_dY-=wavesArray[i].dY;
 	}
-	var resultant_dot = phasorOriginPoint
-	    +(new Point(resultant_dX, resultant_dY));
-	resultantPhasor.add(resultant_dot);
+	var resultant_offset = new Point(resultant_dX, resultant_dY);
+	var resultant_dot = phasorOriginPoint+resultant_offset;
+	line.add(resultant_dot);
+	resultantPhasor = drawArrow(line, resultant_dot,'black',3);
     }
+};
+
+var drawArrow = function(phasorPath, offsetPoint,color,width) {
+    var arrowVector = (offsetPoint-phasorOriginPoint).normalize(10);
+    var group = new Group([
+	phasorPath,
+	new Path([
+	    offsetPoint+arrowVector.rotate(-135),
+	    offsetPoint,
+	    offsetPoint+arrowVector.rotate(135)
+	])
+    ]);
+    group.strokeColor=color;
+    group.strokeWidth=width;
+    return group;
 };
 
 var playButton = document.getElementById('play');
