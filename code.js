@@ -34,7 +34,9 @@ var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
 addWaveButton.addEventListener('click', function() {
     var k = Math.PI*2/1;
-    var w = Math.PI*2*velocityOfMedium/1;
+    //"Drifting" bug fixed here. 
+    //Divide by maxWavelength rather than by 1.
+    var w = Math.PI*2*velocityOfMedium/maxWavelength;
     wavesArray.push(new Wave(1,k,w,0,'blue','-'));
     refreshWaveDiv();
 });
@@ -54,7 +56,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.a_span = null;
     this.lambda = maxWavelength / 1;
     this.k_span = null;
-    this.omega = Math.PI*2*velocityOfMedium/1;
+    this.omega=omega;
     this.omega_span = null;
     this.phiTimeDelta=0;
     this.phi = phi;
