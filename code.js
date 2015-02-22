@@ -58,7 +58,12 @@ function Wave(a,k,omega,phi,color,d) {
     this.offsetPoint=null;
     this.dX=0;
     this.dY=0;
-
+    
+    this.wipe = function() {
+	this.path.removeSegments();
+	this.phasor.remove();
+    };
+    
     this.reset=function() {
 	this.phiTimeDelta=0;
 	this.edit(this.a,this.lambda,this.phi,phasorOriginPoint);
@@ -426,7 +431,14 @@ phasorTailsSelector.addEventListener('change', function() {
 
 var clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function() {
-    
+    for(var i=0; i<wavesArray.length; i++) {
+	wavesArray[i].wipe();
+    }
+    deleteResultant();
+    //lol idk if deleting an array like this is good practice
+    wavesArray = [];
+    refreshWaveDiv();
+    resetPlayButton();
 });
 
 var deleteResultant = function() {
@@ -440,12 +452,17 @@ resetButton.addEventListener('click', function() {
 	wavesArray[i].reset();
     }
     deleteResultant();
-    //Modify the play/pause button manually.
-    play=!play;
-    if(playButton.innerHTML === 'Play') {
-	playButton.innerHTML = 'Pause';
-    } else {
-	playButton.innerHTML = 'Play';
-    }
-
+    resetPlayButton();
 });
+
+var resetPlayButton = function() {
+    //Modify the play/pause button manually.
+    if(play) {
+	play=!play;
+	if(playButton.innerHTML === 'Play') {
+	    playButton.innerHTML = 'Pause';
+	} else {
+	    playButton.innerHTML = 'Play';
+	}
+    }
+};
