@@ -21,7 +21,14 @@ var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
 var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
 var showIndividual=true;
 var showResultant=true;
+var time_elapsed = document.getElementById('time_elapsed');
 
+var resetTimeElapsed = function() {
+    time_elapsed.innerHTML='0';
+};
+var incrementTimeElapsed = function(timeStep) {
+    //use date obj
+};
 
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
@@ -194,16 +201,16 @@ function Wave(a,k,omega,phi,color,d) {
 	//NaN bug here???
 	//waveObj.omega=omega_span.value;
 	eqn.appendChild(omega_span);
-	//t +
-	var t_plus_txt = document.createTextNode('t + ');
+	//t
+	var t_plus_txt = document.createTextNode('t');
 	eqn.appendChild(t_plus_txt);
 	//[0]
 	var phi_span = document.createElement('span');
-	phi_span.innerHTML = '0';
+	phi_span.innerHTML = ' + 0.0';
 	waveObj.phi_span=phi_span;
 	eqn.appendChild(phi_span);
 	//)
-	var end_paren_txt = document.createTextNode(')');
+	var end_paren_txt = document.createTextNode('\u03C0)');
 	eqn.appendChild(end_paren_txt);
 	return eqn;
     };
@@ -262,7 +269,15 @@ function Wave(a,k,omega,phi,color,d) {
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
 	phi_slider.addEventListener('input', function() {
-	    waveObj.phi_span.innerHTML=''+phi_slider.value;
+	    var sign='';
+	    if(parseFloat(phi_slider.value)>0) {
+		sign+=' + ';
+	    } else {
+		sign+=' - ';
+	    }
+	    var scaleByPi = parseFloat(Math.abs(phi_slider.value)) / Math.PI;
+	    scaleByPi = parseFloat(scaleByPi).toFixed(1);
+	    waveObj.phi_span.innerHTML=''+sign+scaleByPi;
 	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
 	return sliders;
@@ -287,11 +302,7 @@ function Wave(a,k,omega,phi,color,d) {
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi,phasorOriginPoint);
     this.waveDOM = this.createWaveDOM();
-    //waveEquationsDiv.appendChild(this.waveDOM);
-
 };
-
-//var wave1 = new Wave(1,0,0,0,'blue','-');
 
 var phasorOrigin = new Path.Circle({
     center:[zeroX/2,zeroY],
@@ -336,6 +347,7 @@ var midwayLine = new Path.Line({
 
 function onFrame(event) {
     if(play) {
+	incrementTimeElapsed(timeStep);
 	//This iterates through the wavesArray and dynamically updates/redraws 
 	//all of the waves onto the screen.
 	for(var i = 0; i <wavesArray.length; i++) {
@@ -454,6 +466,7 @@ clearButton.addEventListener('click', function() {
     wavesArray = [];
     refreshWaveDiv();
     resetPlayButton();
+    resetTimeElapsed();
 });
 
 var deleteResultant = function() {
@@ -468,6 +481,7 @@ resetButton.addEventListener('click', function() {
     }
     deleteResultant();
     resetPlayButton();
+    resetTimeElapsed();
 });
 
 var resetPlayButton = function() {
@@ -498,3 +512,5 @@ wavesToShowSelector.addEventListener('change', function() {
 	showResultant=false;
     }
 });
+
+
