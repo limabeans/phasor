@@ -51,10 +51,11 @@ function Wave(a,k,omega,phi,color,d) {
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
+    this.offsetPoint=null;
     this.dX=0;
     this.dY=0;
 
-    this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
+    this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
 	this.phi = phiSliderVal;
@@ -74,9 +75,9 @@ function Wave(a,k,omega,phi,color,d) {
 
 	}
 	this.path.smooth();
-	this.editPhasor();
+	this.editPhasor(pseudoOrigin);
     };
-    this.editPhasor=function() {
+    this.editPhasor=function(origin) {
 	this.phasor.remove();
 	var line = new Path();
 	var scaledHeight = maxHeight/maxAmpl;
@@ -84,10 +85,10 @@ function Wave(a,k,omega,phi,color,d) {
 	this.dX=deltaX;
 	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
 	this.dY=deltaY;
-	var offset = new Point(phasorOriginPoint.x+deltaX,
-			       phasorOriginPoint.y-deltaY);
-	
-	line.add(phasorOriginPoint);
+	var offset = new Point(origin.x+deltaX,
+			       origin.y-deltaY);
+	this.offsetPoint = offset;
+	line.add(origin);
 	line.add(offset);
 	this.phasor = drawArrow(line,offset,this.color,2);
     };
@@ -97,7 +98,7 @@ function Wave(a,k,omega,phi,color,d) {
     	this.path = new Path({strokeColor: this.color, strokeWidth:1});
 	this.phasor.remove();
     	this.phasor=new Group();
-    	this.edit(this.a, this.w, this.phi);
+    	this.edit(this.a, this.w, this.phi,phasorOriginPoint);
     };
 
 
@@ -222,7 +223,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
 	    waveObj.omega=omega_tmp; //I actually changed omega value here.
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
-	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi);
+	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi,phasorOriginPoint);
 	});
 	sliders.appendChild(num_wavelengths_slider);
 
@@ -240,7 +241,7 @@ function Wave(a,k,omega,phi,color,d) {
 	sliders.appendChild(phi_slider);
 	phi_slider.addEventListener('input', function() {
 	    waveObj.phi_span.innerHTML=''+phi_slider.value;
-	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value));
+	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
 	return sliders;
     };
@@ -262,8 +263,7 @@ function Wave(a,k,omega,phi,color,d) {
 
 
     //Draw initial wave.
-    this.edit(this.a,this.w,this.phi);
-    this.editPhasor();
+    this.edit(this.a,this.w,this.phi,phasorOriginPoint);
     this.waveDOM = this.createWaveDOM();
     //waveEquationsDiv.appendChild(this.waveDOM);
 
@@ -322,12 +322,23 @@ function onFrame(event) {
 	    var omega = parseFloat(wavesArray[i].omega);
 	    if(wavesArray[i].dir==='-') {
 		wavesArray[i].phi -= omega*timeStep;
-		wavesArray[i].edit(wavesArray[i].a,
-				   wavesArray[i].w,wavesArray[i].phi);
 	    } else {
 		wavesArray[i].phi += omega*timeStep;
+	    }
+	    //This is the part where we actually draw to the screen.
+	    //How we edit the waves depends on whether we want the phasors to be 
+	    //all tails at origin, or vector added.
+	    if(tails_at_origin) {
 		wavesArray[i].edit(wavesArray[i].a,
-				   wavesArray[i].w,wavesArray[i].phi);
+				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+	    } else {
+		if(i==0) {
+		    wavesArray[i].edit(wavesArray[i].a,
+				       wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+		} else {
+		    wavesArray[i].edit(wavesArray[i].a,
+				       wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
+		}
 	    }
 	}
 	//resultantWave
@@ -397,5 +408,10 @@ speedSlider.addEventListener('input', function() {
     speedVal = parseFloat(speedVal);
     timeStep=speedVal;
     
+});
+
+var phasorTailsSelector = document.getElementById('phasor_tails');
+phasorTailsSelector.addEventListener('change', function() {
+    tails_at_origin=!tails_at_origin;
 });
 
