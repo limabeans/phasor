@@ -17,6 +17,9 @@ var timeStep = 0.0001;
 var play=false;
 var wavesArray=[];
 var tails_at_origin=true;
+var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
+var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
+
 
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
@@ -44,6 +47,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.k_span = null;
     this.omega = Math.PI*2*velocityOfMedium/1;
     this.omega_span = null;
+    this.phiTimeDelta=0;
     this.phi = phi;
     this.phi_span = null;
     this.w=1;
@@ -54,6 +58,11 @@ function Wave(a,k,omega,phi,color,d) {
     this.offsetPoint=null;
     this.dX=0;
     this.dY=0;
+
+    this.reset=function() {
+	this.phiTimeDelta=0;
+	this.edit(this.a,this.lambda,this.phi,phasorOriginPoint);
+    }
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
 	this.a = amplSliderVal;
@@ -70,7 +79,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    //unit circle.
 	    var sinInput = this.w*scaleFraction*(2*Math.PI);
 	    var scaledHeight = maxHeight/maxAmpl;
-	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi);
+	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi+this.phiTimeDelta);
 	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 
 	}
@@ -81,9 +90,9 @@ function Wave(a,k,omega,phi,color,d) {
 	this.phasor.remove();
 	var line = new Path();
 	var scaledHeight = maxHeight/maxAmpl;
-	var deltaX=scaledHeight*this.a*Math.cos(this.phi);
+	var deltaX=scaledHeight*this.a*Math.cos(this.phi+this.phiTimeDelta);
 	this.dX=deltaX;
-	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
+	var deltaY=scaledHeight*this.a*Math.sin(this.phi+this.phiTimeDelta);
 	this.dY=deltaY;
 	var offset = new Point(origin.x+deltaX,
 			       origin.y-deltaY);
@@ -311,8 +320,6 @@ var midwayLine = new Path.Line({
     strokeColor: 'black'
 });
 
-var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
-var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
 
 function onFrame(event) {
     if(play) {
@@ -321,9 +328,9 @@ function onFrame(event) {
 	for(var i = 0; i <wavesArray.length; i++) {
 	    var omega = parseFloat(wavesArray[i].omega);
 	    if(wavesArray[i].dir==='-') {
-		wavesArray[i].phi -= omega*timeStep;
+		wavesArray[i].phiTimeDelta -= omega*timeStep;
 	    } else {
-		wavesArray[i].phi += omega*timeStep;
+		wavesArray[i].phiTimeDelta += omega*timeStep;
 	    }
 	    //This is the part where we actually draw to the screen.
 	    //How we edit the waves depends on whether we want the phasors to be 
@@ -333,6 +340,7 @@ function onFrame(event) {
 				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
 	    } else {
 		if(i==0) {
+		    //The first phasor should really be at the origin.
 		    wavesArray[i].edit(wavesArray[i].a,
 				       wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
 		} else {
@@ -415,3 +423,29 @@ phasorTailsSelector.addEventListener('change', function() {
     tails_at_origin=!tails_at_origin;
 });
 
+
+var clearButton = document.getElementById('clear');
+clearButton.addEventListener('click', function() {
+    
+});
+
+var deleteResultant = function() {
+    resultantWave.removeSegments();
+    resultantPhasor.remove();
+};
+
+var resetButton = document.getElementById('reset');
+resetButton.addEventListener('click', function() {
+    for(var i=0; i<wavesArray.length; i++) {
+	wavesArray[i].reset();
+    }
+    deleteResultant();
+    //Modify the play/pause button manually.
+    play=!play;
+    if(playButton.innerHTML === 'Play') {
+	playButton.innerHTML = 'Pause';
+    } else {
+	playButton.innerHTML = 'Play';
+    }
+
+});
