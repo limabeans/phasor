@@ -50,7 +50,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
-
+    this.dX=0;
+    this.dY=0;
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal) {
 	this.a = amplSliderVal;
@@ -79,7 +80,9 @@ function Wave(a,k,omega,phi,color,d) {
 	var line = new Path();
 	var scaledHeight = maxHeight/maxAmpl;
 	var deltaX=scaledHeight*this.a*Math.cos(this.phi);
+	this.dX=deltaX;
 	var deltaY=scaledHeight*this.a*Math.sin(this.phi);
+	this.dY=deltaY;
 	var offset = new Point(phasorOriginPoint.x+deltaX,
 			       phasorOriginPoint.y-deltaY);
 	
@@ -317,61 +320,13 @@ var midwayLine = new Path.Line({
     strokeColor: 'black'
 });
 
-// var amplSlider = document.getElementById('amplitude');
-// amplSlider.addEventListener('input', function() {
-//     //Editing numerical label here.
-//     document.getElementById('wave_amp').innerHTML=''+amplSlider.value;
-//     //Editing the actual wave that the user sees.
-//     var sliderVal = parseFloat(amplSlider.value);
-//     wave1.edit(sliderVal,wave1.w,wave1.phi,wave1.dir);
-// });
-
-
-// var wavelengthSlider = document.getElementById('wavelength');
-// wavelengthSlider.addEventListener('input', function() {
-//     var sliderVal = parseFloat(wavelengthSlider.value);
-//     var k = 2*Math.PI/sliderVal;
-//     k = parseFloat(k).toFixed(2);
-//     var w = 2*Math.PI*velocityOfMedium/sliderVal;
-//     w = parseFloat(w).toFixed(2);
-//     document.getElementById('wave_k').innerHTML=''+k;
-//     document.getElementById('wave_w').innerHTML=''+w;
-
-//     wave1.edit(wave1.a, sliderVal, wave1.phi, wave1.dir);
-// });
-
-// var phiSlider = document.getElementById('phi');
-// phiSlider.addEventListener('input', function() {
-//     var sliderVal = parseFloat(phiSlider.value);
-//     var wave_phi = document.getElementById('wave_phi');
-//     wave_phi.innerHTML= ''+sliderVal;
-//     wave1.edit(wave1.a, wave1.w, sliderVal, wave1.dir);
-
-// });
-
-// var directionDropdown = document.getElementById('dir');
-// console.log(directionDropdown);
-// directionDropdown.addEventListener('change', function() {
-//     reverseFlag=!reverseFlag;
-
-//     if(wave1.dir==='-') {
-// 	wave1.dir='+';
-//     } else {
-// 	wave1.dir='-';
-//     }
-// });
-
-
-// var colorDropdown = document.getElementById('color');
-// colorDropdown.addEventListener('change', function() {
-//     wave1.color = colorDropdown.value;
-//     wave1.refresh();
-// });
-
-var resultant = new Path({strokeColor:'black', strokeWidth:2});
+var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
 var resultantPhasor = new Path({strokeColor: 'black', strokeWidth:3});
+
 function onFrame(event) {
     if(play) {
+	//This iterates through the wavesArray and dynamically updates/redraws 
+	//all of the waves onto the screen.
 	for(var i = 0; i <wavesArray.length; i++) {
 	    var omega = parseFloat(wavesArray[i].omega);
 	    if(wavesArray[i].dir==='-') {
@@ -384,26 +339,33 @@ function onFrame(event) {
 				   wavesArray[i].w,wavesArray[i].phi);
 	    }
 	}
-	//resultant
-	resultant.removeSegments();
+	//resultantWave
+	resultantWave.removeSegments();
 	if(wavesArray.length>0) {
-
 	    for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
-		var resultant_x=0;
-		var resultant_y=0;
+		var resultantWave_x=0;
+		var resultantWave_y=0;
 		for(var s = 0; s < wavesArray.length; s++) {
-		    resultant_x=wavesArray[0].path.segments[i].point.x;
-
-		    resultant_y = resultant_y + (zeroY - wavesArray[s].path.segments[i].point.y);
-		    
+		    resultantWave_x=wavesArray[0].path.segments[i].point.x;
+		    resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
 		}
-		
-		resultant.add(new Point(resultant_x, zeroY-resultant_y));
-		resultant.smooth();
-		//console.log(wavesArray[0].phasor.children[0]);
-
+		resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
+		resultantWave.smooth();
 	    }
 	}
+
+	//resultantPhasor
+	resultantPhasor.removeSegments();
+	resultantPhasor.add(phasorOriginPoint);
+	var resultant_dX=0;
+	var resultant_dY=0;
+	for(var i=0; i < wavesArray.length; i++) {
+	    resultant_dX+=wavesArray[i].dX;
+	    resultant_dY-=wavesArray[i].dY;
+	}
+	var resultant_dot = phasorOriginPoint
+	    +(new Point(resultant_dX, resultant_dY));
+	resultantPhasor.add(resultant_dot);
     }
 };
 

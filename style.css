@@ -10,10 +10,12 @@ select::-ms-expand {
 }
 
 #adder {
-    border: 1px solid black;
+    margin-left:75%;
 }
 #waveCanvas {
     border: 1px solid black;
+    float: left;
+    width: 75%;
 }
 #config {
     border: 1px solid black;
@@ -45,10 +47,6 @@ select::-ms-expand {
 
 #speed {
     width: 80px;
-}
-
-#waveCanvas {
-    width: 90%;
 }
 
 .center {
