@@ -16,6 +16,7 @@ var velocityOfMedium = 10;
 var timeStep = 0.0001;
 var play=false;
 var wavesArray=[];
+var tails_at_origin=true;
 
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
@@ -89,17 +90,6 @@ function Wave(a,k,omega,phi,color,d) {
 	line.add(phasorOriginPoint);
 	line.add(offset);
 	this.phasor = drawArrow(line,offset,this.color,2);
-	// var arrowVector = (offset-phasorOriginPoint).normalize(10);
-	// this.phasor = new Group([
-	//     line,
-	//     new Path([
-	// 	offset+arrowVector.rotate(-135),
-	// 	offset,
-	// 	offset+arrowVector.rotate(135)
-	//     ])
-	// ]);
-	// this.phasor.strokeColor=this.color;
-	// this.phasor.strokeWidth=2;
     };
     
     this.refresh = function() {
