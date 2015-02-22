@@ -19,6 +19,8 @@ var wavesArray=[];
 var tails_at_origin=true;
 var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
 var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
+var showIndividual=true;
+var showResultant=true;
 
 
 var addWaveButton = document.getElementById('add_wave');
@@ -58,7 +60,14 @@ function Wave(a,k,omega,phi,color,d) {
     this.offsetPoint=null;
     this.dX=0;
     this.dY=0;
-    
+
+    this.setVisible = function() {
+	this.path.opacity=1;
+	this.phasor.opacity=1;
+    };
+    this.setInvisible = function() {
+	this.path.opacity=0;
+    };
     this.wipe = function() {
 	this.path.removeSegments();
 	this.phasor.remove();
@@ -73,7 +82,6 @@ function Wave(a,k,omega,phi,color,d) {
 	this.a = amplSliderVal;
 	this.w = wavelengthSliderVal;
 	this.phi = phiSliderVal;
-	
 	
 	this.path.removeSegments();
 	for(var i = 0; i <= pointsPerWave; i++) {
@@ -337,9 +345,15 @@ function onFrame(event) {
 	    } else {
 		wavesArray[i].phiTimeDelta += omega*timeStep;
 	    }
+	    if(showIndividual) {
+		wavesArray[i].setVisible();
+	    } else {
+		wavesArray[i].setInvisible();
+	    }
 	    //This is the part where we actually draw to the screen.
 	    //How we edit the waves depends on whether we want the phasors to be 
 	    //all tails at origin, or vector added.
+	    //We won't see anything on the screen, however, if the individual waves were set to invisible.
 	    if(tails_at_origin) {
 		wavesArray[i].edit(wavesArray[i].a,
 				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
@@ -353,22 +367,24 @@ function onFrame(event) {
 				       wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
 		}
 	    }
+
 	}
-	//resultantWave
-	resultantWave.removeSegments();
-	if(wavesArray.length>0) {
-	    for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
-		var resultantWave_x=0;
-		var resultantWave_y=0;
-		for(var s = 0; s < wavesArray.length; s++) {
-		    resultantWave_x=wavesArray[0].path.segments[i].point.x;
-		    resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+	if(showResultant) {
+	    //resultantWave
+	    resultantWave.removeSegments();
+	    if(wavesArray.length>0) {
+		for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
+		    var resultantWave_x=0;
+		    var resultantWave_y=0;
+		    for(var s = 0; s < wavesArray.length; s++) {
+			resultantWave_x=wavesArray[0].path.segments[i].point.x;
+			resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+		    }
+		    resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
+		    resultantWave.smooth();
 		}
-		resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
-		resultantWave.smooth();
 	    }
 	}
-
 	//resultantPhasor
 	resultantPhasor.remove();
 	var line = new Path();
@@ -415,7 +431,6 @@ var speedSlider = document.getElementById('speed');
 var speed_val = document.getElementById('speed_val');
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
-    console.log(speedVal);
     var scaled = parseFloat(speedVal*1000).toFixed(1);
     speed_val.innerHTML=''+scaled;
     speedVal = parseFloat(speedVal);
@@ -466,3 +481,20 @@ var resetPlayButton = function() {
 	}
     }
 };
+
+var wavesToShowSelector = document.getElementById('wave_option');
+wavesToShowSelector.addEventListener('change', function() {
+    if(wavesToShowSelector.value === 'show_all') {
+	showIndividual=true;
+	showResultant=true;
+    }
+    if(wavesToShowSelector.value === 'resultant_only') {
+	showIndividual=false;
+	showResultant=true;
+    }
+    if(wavesToShowSelector.value === 'individual_only') {
+	showIndividual=true;
+	resultantWave.removeSegments();
+	showResultant=false;
+    }
+});
