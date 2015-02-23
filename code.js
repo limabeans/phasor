@@ -13,7 +13,8 @@ var maxWavelength = wavelength*maxAmpl;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
-var timeStep = 0.0001;
+var currentTime=0;
+var timeStep = 0.001;
 var play=false;
 var wavesArray=[];
 var tails_at_origin=true;
@@ -21,14 +22,29 @@ var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
 var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
 var showIndividual=true;
 var showResultant=true;
-var time_elapsed = document.getElementById('time_elapsed');
 
+var setIntervalInitialized=false;
+var setIntervalVariable = null;
+
+var time_elapsed = document.getElementById('time_elapsed');
 var resetTimeElapsed = function() {
+    currentTime=0;
+    clearInterval(setIntervalVariable);
+    setIntervalInitialized=false;
     time_elapsed.innerHTML='0';
+
 };
 var incrementTimeElapsed = function(timeStep) {
-    //use date obj
+    var scaledTime = .1;
+    currentTime+=scaledTime;
+    console.log(currentTime);
+    if(currentTime%1===0) {
+	var textTime = ''+parseFloat(currentTime).toFixed(0);
+	time_elapsed.innerHTML=textTime;
+    }
+
 };
+
 
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
@@ -350,7 +366,18 @@ var midwayLine = new Path.Line({
 
 function onFrame(event) {
     if(play) {
-	incrementTimeElapsed(timeStep);
+	if(!setIntervalInitialized) {
+	    if(speedSlider.value!=='0') {
+		console.log(speedSlider.value);
+		setIntervalVariable = setInterval(function() {
+		    currentTime+=1;
+		    time_elapsed.innerHTML=''+currentTime;
+		}, 1000/speedSlider.value);
+
+		setIntervalInitialized=true;
+	    }
+	}
+
 	//This iterates through the wavesArray and dynamically updates/redraws 
 	//all of the waves onto the screen.
 	for(var i = 0; i <wavesArray.length; i++) {
@@ -435,8 +462,10 @@ var drawArrow = function(phasorPath, offsetPoint,color,width) {
 var playButton = document.getElementById('play');
 playButton.addEventListener('click', function() {
     play=!play;
-    if(!play) {
+    if(!play) { //Pause.
 	deleteResultant();
+	clearInterval(setIntervalVariable);
+	setIntervalInitialized=false;
     }
     if(playButton.innerHTML === 'Play') {
 	playButton.innerHTML = 'Pause';
@@ -449,11 +478,23 @@ var speedSlider = document.getElementById('speed');
 var speed_val = document.getElementById('speed_val');
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
-    var scaled = parseFloat(speedVal*1000).toFixed(1);
+    var scaled = parseFloat(speedVal).toFixed(1);
     speed_val.innerHTML=''+scaled;
     speedVal = parseFloat(speedVal);
-    timeStep=speedVal;
+    //Scale the timeStep downwards.
+    timeStep=speedVal/1000;
     
+    //Modifying the timer on the screen.
+    if(play) {
+	clearInterval(setIntervalVariable);
+	if(speedVal!==0) {
+	    setIntervalVariable = setInterval(function() {
+		currentTime+=1;
+		time_elapsed.innerHTML=''+currentTime;
+	    }, 1000/speedVal);
+	    setIntervalInitialized=true;
+	}
+    }
 });
 
 var phasorTailsSelector = document.getElementById('phasor_tails');
@@ -473,6 +514,7 @@ clearButton.addEventListener('click', function() {
     refreshWaveDiv();
     resetPlayButton();
     resetTimeElapsed();
+
 });
 
 var deleteResultant = function() {
@@ -487,6 +529,7 @@ resetButton.addEventListener('click', function() {
     }
     deleteResultant();
     resetPlayButton();
+    
     resetTimeElapsed();
 });
 
