@@ -84,7 +84,7 @@ function Wave(a,k,omega,phi,color,d) {
     
     this.reset=function() {
 	this.phiTimeDelta=0;
-	this.edit(this.a,this.lambda,this.phi,phasorOriginPoint);
+	this.edit(this.a,this.w,this.phi,phasorOriginPoint);
     }
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
@@ -265,12 +265,13 @@ function Wave(a,k,omega,phi,color,d) {
 	var phi_slider = document.createElement('input');
 	phi_slider.type='range';
 	phi_slider.className='sliders';
-	phi_slider.min='-6.283';
-	phi_slider.max='6.283';
-	phi_slider.step='0.01';
+	phi_slider.min='-6.283185307179586';
+	phi_slider.max='6.283185307179586';
+	phi_slider.step='0.00000001';
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
 	phi_slider.addEventListener('input', function() {
+	    console.log(phi_slider.value);
 	    var sign='';
 	    if(parseFloat(phi_slider.value)>0) {
 		sign+=' + ';
@@ -278,7 +279,7 @@ function Wave(a,k,omega,phi,color,d) {
 		sign+=' - ';
 	    }
 	    var scaleByPi = parseFloat(Math.abs(phi_slider.value)) / Math.PI;
-	    scaleByPi = parseFloat(scaleByPi).toFixed(1);
+	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
 	    waveObj.phi_span.innerHTML=''+sign+scaleByPi;
 	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
@@ -434,6 +435,9 @@ var drawArrow = function(phasorPath, offsetPoint,color,width) {
 var playButton = document.getElementById('play');
 playButton.addEventListener('click', function() {
     play=!play;
+    if(!play) {
+	deleteResultant();
+    }
     if(playButton.innerHTML === 'Play') {
 	playButton.innerHTML = 'Pause';
     } else {
