@@ -12,6 +12,7 @@ select::-ms-expand {
 #adder {
     margin-left:70%;
 }
+
 #waveCanvas {
     border: 1px solid black;
     float: left;

@@ -34,6 +34,7 @@ var resetTimeElapsed = function() {
     time_elapsed.innerHTML='0';
 
 };
+
 var incrementTimeElapsed = function(timeStep) {
     var scaledTime = .1;
     currentTime+=scaledTime;
@@ -44,7 +45,6 @@ var incrementTimeElapsed = function(timeStep) {
     }
 
 };
-
 
 var addWaveButton = document.getElementById('add_wave');
 var waveEquationsDiv = document.getElementById('adder');
@@ -64,10 +64,14 @@ var refreshWaveDiv = function() {
     }
     for(var i = 0; i < wavesArray.length; i++) {
 	waveEquationsDiv.appendChild(wavesArray[i].waveDOM);
+	//Regenerating the array index of every wave.
+	wavesArray[i].arrayIndex=i;
     }
+    console.log(wavesArray);
 };
 
 function Wave(a,k,omega,phi,color,d) {
+    this.arrayIndex=-1;
     this.a = a;
     this.a_span = null;
     this.lambda = maxWavelength / 1;
@@ -287,7 +291,6 @@ function Wave(a,k,omega,phi,color,d) {
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
 	phi_slider.addEventListener('input', function() {
-	    console.log(phi_slider.value);
 	    var sign='';
 	    if(parseFloat(phi_slider.value)>0) {
 		sign+=' + ';
@@ -303,24 +306,41 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
 
-    this.createWaveDOM = function() {
+    this.createWaveDOM = function(waveObj) {
 	var wave = document.createElement('div');
+
 	var colorDropdown = this.createColorDropdown(this);
 	var eqn = this.createWaveEqn(this);
 	var newline = document.createElement('span');
+
+	var deleteButton = document.createElement('button');
+	deleteButton.innerHTML='X';
+	deleteButton.addEventListener('click', function() {
+	    waveObj.wipe();
+	    wavesArray.splice(waveObj.arrayIndex,1);
+	    refreshWaveDiv();
+
+	});
+
+
 	newline.innerHTML='<br>';
 	var sliders = this.createWaveSlidersDOM(this);
 	wave.appendChild(colorDropdown);
 	wave.appendChild(eqn);
+
+	wave.appendChild(deleteButton);
+
 	wave.appendChild(newline);
 	wave.appendChild(sliders);
+
+
 	return wave;
     };
 
 
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi,phasorOriginPoint);
-    this.waveDOM = this.createWaveDOM();
+    this.waveDOM = this.createWaveDOM(this);
 };
 
 var phasorOrigin = new Path.Circle({
@@ -368,7 +388,6 @@ function onFrame(event) {
     if(play) {
 	if(!setIntervalInitialized) {
 	    if(speedSlider.value!=='0') {
-		console.log(speedSlider.value);
 		setIntervalVariable = setInterval(function() {
 		    currentTime+=1;
 		    time_elapsed.innerHTML=''+currentTime;
