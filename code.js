@@ -135,6 +135,7 @@ function Wave(a,k,omega,phi,color,d) {
 	this.path.smooth();
 	this.editPhasor(pseudoOrigin);
 
+
 	//Redraw the resultant wave.
 	//This case only happens when the animation is paused,
 	//or else things will lag, because double drawing.
