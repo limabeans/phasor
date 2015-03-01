@@ -156,7 +156,7 @@ function Wave(a,k,omega,phi,color,d) {
 	this.offsetPoint = offset;
 	line.add(origin);
 	line.add(offset);
-	this.phasor = drawArrow(line,offset,this.color,2);
+	this.phasor = drawArrow(line,offset,origin,this.color,2);
 	if(this.isInvisible) {
 	    this.path.opacity=0;
 	    this.phasor.opacity=0;
@@ -455,8 +455,8 @@ function onFrame(event) {
     }
 };
 
-var drawArrow = function(phasorPath, offsetPoint,color,width) {
-    var arrowVector = (offsetPoint-phasorOriginPoint).normalize(10);
+var drawArrow = function(phasorPath, offsetPoint, referenceOrigin,color,width) {
+    var arrowVector = (offsetPoint-referenceOrigin).normalize(10);
     var group = new Group([
 	phasorPath,
 	new Path([
@@ -602,5 +602,5 @@ var refreshResultant = function() {
     var resultant_offset = new Point(resultant_dX, resultant_dY);
     var resultant_dot = phasorOriginPoint+resultant_offset;
     line.add(resultant_dot);
-    resultantPhasor = drawArrow(line, resultant_dot,'black',3);
+    resultantPhasor = drawArrow(line, resultant_dot,phasorOriginPoint,'black',3);
 };
