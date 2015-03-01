@@ -38,7 +38,6 @@ var resetTimeElapsed = function() {
 var incrementTimeElapsed = function(timeStep) {
     var scaledTime = .1;
     currentTime+=scaledTime;
-    console.log(currentTime);
     if(currentTime%1===0) {
 	var textTime = ''+parseFloat(currentTime).toFixed(0);
 	time_elapsed.innerHTML=textTime;
@@ -47,7 +46,7 @@ var incrementTimeElapsed = function(timeStep) {
 };
 
 var addWaveButton = document.getElementById('add_wave');
-var waveEquationsDiv = document.getElementById('adder');
+
 addWaveButton.addEventListener('click', function() {
     var k = Math.PI*2/1;
     //"Drifting" bug fixed here. 
@@ -55,8 +54,13 @@ addWaveButton.addEventListener('click', function() {
     var w = Math.PI*2*velocityOfMedium/maxWavelength;
     wavesArray.push(new Wave(1,k,w,0,'blue','-'));
     refreshWaveDiv();
+    if(showResultant) {
+	refreshResultant();
+    }
 });
 
+
+var waveEquationsDiv = document.getElementById('adder');
 var refreshWaveDiv = function() {
     //Clear it up.
     while (waveEquationsDiv.hasChildNodes()) {
@@ -67,7 +71,6 @@ var refreshWaveDiv = function() {
 	//Regenerating the array index of every wave.
 	wavesArray[i].arrayIndex=i;
     }
-    console.log(wavesArray);
 };
 
 function Wave(a,k,omega,phi,color,d) {
@@ -89,13 +92,25 @@ function Wave(a,k,omega,phi,color,d) {
     this.offsetPoint=null;
     this.dX=0;
     this.dY=0;
+    this.isInvisible=false;
 
     this.setVisible = function() {
 	this.path.opacity=1;
 	this.phasor.opacity=1;
+	this.isInvisible=false;
     };
     this.setInvisible = function() {
+	this.isInvisible=true;
 	this.path.opacity=0;
+	this.phasor.opacity=0;
+	//console.log(this.phasor);
+	//this.phasor.children[0].opacity=0;
+	//this.phasor.children[1].opacity=0;
+	//this.phasor.children[2].opacity=0;
+	//console.log(this.phasor.children[0].opacity);
+	//this.phasor.selected=true;
+	//this.phasor.opacity=0;
+	//this.phasor.strokeColor='white';
     };
     this.wipe = function() {
 	this.path.removeSegments();
@@ -127,6 +142,14 @@ function Wave(a,k,omega,phi,color,d) {
 	}
 	this.path.smooth();
 	this.editPhasor(pseudoOrigin);
+
+	//Redraw the resultant wave.
+	//This case only happens when the animation is paused,
+	//or else things will lag, because double drawing.
+	if(showResultant && !play) {
+	    refreshResultant();
+	}
+
     };
     this.editPhasor=function(origin) {
 	this.phasor.remove();
@@ -142,6 +165,10 @@ function Wave(a,k,omega,phi,color,d) {
 	line.add(origin);
 	line.add(offset);
 	this.phasor = drawArrow(line,offset,this.color,2);
+	if(this.isInvisible) {
+	    this.path.opacity=0;
+	    this.phasor.opacity=0;
+	}
     };
     
     this.refresh = function() {
@@ -431,35 +458,9 @@ function onFrame(event) {
 
 	}
 	if(showResultant) {
-	    //resultantWave
-	    resultantWave.removeSegments();
-	    if(wavesArray.length>0) {
-		for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
-		    var resultantWave_x=0;
-		    var resultantWave_y=0;
-		    for(var s = 0; s < wavesArray.length; s++) {
-			resultantWave_x=wavesArray[0].path.segments[i].point.x;
-			resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
-		    }
-		    resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
-		    resultantWave.smooth();
-		}
-	    }
+	    refreshResultant();
 	}
-	//resultantPhasor
-	resultantPhasor.remove();
-	var line = new Path();
-	line.add(phasorOriginPoint);
-	var resultant_dX=0;
-	var resultant_dY=0;
-	for(var i=0; i < wavesArray.length; i++) {
-	    resultant_dX+=wavesArray[i].dX;
-	    resultant_dY-=wavesArray[i].dY;
-	}
-	var resultant_offset = new Point(resultant_dX, resultant_dY);
-	var resultant_dot = phasorOriginPoint+resultant_offset;
-	line.add(resultant_dot);
-	resultantPhasor = drawArrow(line, resultant_dot,'black',3);
+
     }
 };
 
@@ -482,7 +483,6 @@ var playButton = document.getElementById('play');
 playButton.addEventListener('click', function() {
     play=!play;
     if(!play) { //Pause.
-	deleteResultant();
 	clearInterval(setIntervalVariable);
 	setIntervalInitialized=false;
     }
@@ -576,9 +576,40 @@ wavesToShowSelector.addEventListener('change', function() {
     }
     if(wavesToShowSelector.value === 'individual_only') {
 	showIndividual=true;
-	resultantWave.removeSegments();
+	deleteResultant();
 	showResultant=false;
     }
 });
 
 
+var refreshResultant = function() {
+    //resultantWave
+    resultantWave.removeSegments();
+    if(wavesArray.length>0) {
+	for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
+	    var resultantWave_x=0;
+	    var resultantWave_y=0;
+	    for(var s = 0; s < wavesArray.length; s++) {
+		resultantWave_x=wavesArray[0].path.segments[i].point.x;
+		resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+	    }
+	    resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
+	    resultantWave.smooth();
+	}
+    }
+
+    //resultantPhasor
+    resultantPhasor.remove();
+    var line = new Path();
+    line.add(phasorOriginPoint);
+    var resultant_dX=0;
+    var resultant_dY=0;
+    for(var i=0; i < wavesArray.length; i++) {
+	resultant_dX+=wavesArray[i].dX;
+	resultant_dY-=wavesArray[i].dY;
+    }
+    var resultant_offset = new Point(resultant_dX, resultant_dY);
+    var resultant_dot = phasorOriginPoint+resultant_offset;
+    line.add(resultant_dot);
+    resultantPhasor = drawArrow(line, resultant_dot,'black',3);
+};
