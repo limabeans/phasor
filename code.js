@@ -103,14 +103,6 @@ function Wave(a,k,omega,phi,color,d) {
 	this.isInvisible=true;
 	this.path.opacity=0;
 	this.phasor.opacity=0;
-	//console.log(this.phasor);
-	//this.phasor.children[0].opacity=0;
-	//this.phasor.children[1].opacity=0;
-	//this.phasor.children[2].opacity=0;
-	//console.log(this.phasor.children[0].opacity);
-	//this.phasor.selected=true;
-	//this.phasor.opacity=0;
-	//this.phasor.strokeColor='white';
     };
     this.wipe = function() {
 	this.path.removeSegments();
@@ -455,7 +447,6 @@ function onFrame(event) {
 				       wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
 		}
 	    }
-
 	}
 	if(showResultant) {
 	    refreshResultant();
