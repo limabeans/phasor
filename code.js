@@ -83,7 +83,9 @@ function Wave(a,k,omega,phi,color,d) {
     this.omega_span = null;
     this.phiTimeDelta=0;
     this.phi = phi;
+    this.phi_slider = null;
     this.phi_span = null;
+    this.phi_input = null;
     this.w=1;
     this.color = color;
     this.dir=d;
@@ -243,17 +245,29 @@ function Wave(a,k,omega,phi,color,d) {
 	//NaN bug here???
 	//waveObj.omega=omega_span.value;
 	eqn.appendChild(omega_span);
-	//t
-	var t_plus_txt = document.createTextNode('t');
+	//t +
+	var t_plus_txt = document.createTextNode('t + ');
 	eqn.appendChild(t_plus_txt);
 	//[0]
-	var phi_span = document.createElement('span');
-	phi_span.innerHTML = ' + 0.0';
-	waveObj.phi_span=phi_span;
-	eqn.appendChild(phi_span);
+	var phiInput = document.createElement('input');
+	phiInput.value='0.000';
+	phiInput.size='4';
+	waveObj.phi_input = phiInput;
+	eqn.appendChild(phiInput);
+	phiInput.addEventListener('keydown', function() {
+	    //[enter] 
+	    if(event.keyCode == 13) {
+		var floatVal = eval(phiInput.value)*Math.PI;
+		waveObj.phi_slider.value=''+floatVal;
+		console.log('enter');
+		waveObj.edit(waveObj.a,waveObj.w, floatVal, phasorOriginPoint);
+	    }
+	});
+
 	//)
 	var end_paren_txt = document.createTextNode('\u03C0)');
 	eqn.appendChild(end_paren_txt);
+	
 	return eqn;
     };
 
@@ -310,6 +324,7 @@ function Wave(a,k,omega,phi,color,d) {
 	phi_slider.step='0.00000001';
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
+	waveObj.phi_slider = phi_slider;
 	phi_slider.addEventListener('input', function() {
 	    var sign='';
 	    if(parseFloat(phi_slider.value)>0) {
@@ -319,7 +334,8 @@ function Wave(a,k,omega,phi,color,d) {
 	    }
 	    var scaleByPi = parseFloat(Math.abs(phi_slider.value)) / Math.PI;
 	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
-	    waveObj.phi_span.innerHTML=''+sign+scaleByPi;
+	    //waveObj.phi_span.innerHTML=''+sign+scaleByPi;
+	    waveObj.phi_input.value=''+scaleByPi;
 	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
 	return sliders;
