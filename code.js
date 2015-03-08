@@ -442,44 +442,50 @@ function onFrame(event) {
 		setIntervalInitialized=true;
 	    }
 	}
-
-	//This iterates through the wavesArray and dynamically updates/redraws 
-	//all of the waves onto the screen.
-	for(var i = 0; i <wavesArray.length; i++) {
-	    var omega = parseFloat(wavesArray[i].omega);
-	    if(wavesArray[i].dir==='-') {
-		wavesArray[i].phiTimeDelta -= omega*timeStep;
-	    } else {
-		wavesArray[i].phiTimeDelta += omega*timeStep;
-	    }
-	    if(showIndividual) {
-		wavesArray[i].setVisible();
-	    } else {
-		wavesArray[i].setInvisible();
-	    }
-	    //This is the part where we actually draw to the screen.
-	    //How we edit the waves depends on whether we want the phasors to be 
-	    //all tails at origin, or vector added.
-	    //We won't see anything on the screen, however, if the individual waves were set to invisible.
-	    if(tails_at_origin) {
-		wavesArray[i].edit(wavesArray[i].a,
-				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
-	    } else {
-		if(i==0) {
-		    //The first phasor should really be at the origin.
-		    wavesArray[i].edit(wavesArray[i].a,
-				       wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
-		} else {
-		    wavesArray[i].edit(wavesArray[i].a,
-				       wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
-		}
-	    }
-	}
+	
+	refreshWaves();
+	
 	if(showResultant) {
 	    refreshResultant();
 	}
 
     }
+};
+
+refreshWaves = function() {
+
+    //This iterates through the wavesArray and dynamically updates/redraws 
+    //all of the waves onto the screen.
+    for(var i = 0; i <wavesArray.length; i++) {
+	var omega = parseFloat(wavesArray[i].omega);
+	if(wavesArray[i].dir==='-') {
+	    wavesArray[i].phiTimeDelta -= omega*timeStep;
+	} else {
+	    wavesArray[i].phiTimeDelta += omega*timeStep;
+	}
+	if(showIndividual) {
+	    wavesArray[i].setVisible();
+	} else {
+	    wavesArray[i].setInvisible();
+	}
+	//This is the part where we actually draw to the screen.
+	//How we edit the waves depends on whether we want the phasors to be 
+	//all tails at origin, or vector added.
+	//We won't see anything on the screen, however, if the individual waves were set to invisible.
+	if(tails_at_origin) {
+	    wavesArray[i].edit(wavesArray[i].a,
+			       wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+	} else {
+	    if(i==0) {
+		//The first phasor should really be at the origin.
+		wavesArray[i].edit(wavesArray[i].a,
+				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+	    } else {
+		wavesArray[i].edit(wavesArray[i].a,
+				   wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
+	    }
+	}
+    }    
 };
 
 var drawArrow = function(phasorPath, offsetPoint, referenceOrigin,color,width) {
@@ -537,6 +543,7 @@ speedSlider.addEventListener('input', function() {
 var phasorTailsSelector = document.getElementById('phasor_tails');
 phasorTailsSelector.addEventListener('change', function() {
     tails_at_origin=!tails_at_origin;
+    refreshWaves();
 });
 
 
@@ -597,6 +604,7 @@ wavesToShowSelector.addEventListener('change', function() {
 	deleteResultant();
 	showResultant=false;
     }
+    refreshWaves();
 });
 
 
