@@ -60,17 +60,33 @@ addWaveButton.addEventListener('click', function() {
 });
 
 
+var createTable = function() {
+    var table = document.createElement('table');
+    table.border = '1';
+    var head = document.createElement('th');
+    head.innerHTML = 'wave table';
+    table.appendChild(head);
+    return table;
+};
+
 var waveEquationsDiv = document.getElementById('adder');
+waveEquationsDiv.appendChild(createTable());
 var refreshWaveDiv = function() {
     //Clear it up.
     while (waveEquationsDiv.hasChildNodes()) {
 	waveEquationsDiv.removeChild(waveEquationsDiv.lastChild);
     }
+    var tableRef = createTable();
+    waveEquationsDiv.appendChild(tableRef);
     for(var i = 0; i < wavesArray.length; i++) {
-	waveEquationsDiv.appendChild(wavesArray[i].waveDOM);
+	var tr = document.createElement('tr');
+	tr.border='1';
+	tr.appendChild(wavesArray[i].waveDOM);
+	tableRef.appendChild(tr);
 	//Regenerating the array index of every wave.
 	wavesArray[i].arrayIndex=i;
     }
+    console.log(tableRef.rows.length);
 };
 
 function Wave(a,k,omega,phi,color,d) {
@@ -264,7 +280,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    }
 	});
 
-	//)
+	//pi)
 	var end_paren_txt = document.createTextNode('\u03C0)');
 	eqn.appendChild(end_paren_txt);
 	
@@ -326,15 +342,8 @@ function Wave(a,k,omega,phi,color,d) {
 	sliders.appendChild(phi_slider);
 	waveObj.phi_slider = phi_slider;
 	phi_slider.addEventListener('input', function() {
-	    var sign='';
-	    if(parseFloat(phi_slider.value)>0) {
-		sign+=' + ';
-	    } else {
-		sign+=' - ';
-	    }
-	    var scaleByPi = parseFloat(Math.abs(phi_slider.value)) / Math.PI;
+	    var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
 	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
-	    //waveObj.phi_span.innerHTML=''+sign+scaleByPi;
 	    waveObj.phi_input.value=''+scaleByPi;
 	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
@@ -344,6 +353,7 @@ function Wave(a,k,omega,phi,color,d) {
 
     this.createWaveDOM = function(waveObj) {
 	var wave = document.createElement('div');
+	
 
 	var colorDropdown = this.createColorDropdown(this);
 	var eqn = this.createWaveEqn(this);
@@ -355,7 +365,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    waveObj.wipe();
 	    wavesArray.splice(waveObj.arrayIndex,1);
 	    refreshWaveDiv();
-
+	    refreshResultant();
 	});
 
 

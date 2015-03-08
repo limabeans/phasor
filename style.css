@@ -67,3 +67,6 @@ select::-ms-expand {
 }
 
 
+table, th, td {
+   border: 1px solid black;
+}
