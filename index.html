@@ -4,15 +4,15 @@
     <script type="text/javascript" src="paper-full.min.js"></script>
     <script type="text/paperscript" canvas="waveCanvas" src="code.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <!-- x<link rel="stylesheet" type="test/css" href="bootstrap.min.css"> -->
   </head>
   <body>
+    <input type="file" id="import"></input>
     <button id="play">Play</button>
     <button id="reset">Reset</button>
     <button id="clear">Clear</button>
     <span id="speed_val">1</span>x
     <input class="sliders" type="range" id="speed" min="0" max="5" step=".5" value="1"></input>
-    <button id="add_wave">Add wave</button>
+
     <select id="phasor_tails">
       <option value="tails_at_origin">Tails at origin</option>
       <option value="vector_addition">Vector addition</option>
@@ -22,13 +22,13 @@
       <option value="resultant_only">Resultant only</option>
       <option value="individual_only">Individual only</option>
     </select>
-    <!--<button>Import</button>-->
-
+    <button id="add_wave">Add wave</button>
     <br>
 
     <canvas id="waveCanvas" resize="true" keepalive="true" ></canvas>
     <div class="center" id="adder">
     </div>
     <div id="footer"><h1><span id="time_elapsed">0</span> seconds</h1></div>
+    <div id="file_contents">file!</div>
   </body>
 </html>

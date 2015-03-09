@@ -66,7 +66,12 @@ select::-ms-expand {
     bottom:0;
 }
 
+h1 {
+    font-family: "Courier New";
+    font-size: 60px;
+}
 
-table, th, td {
-   border: 1px solid black;
+
+button,select,input {
+    font-family: "Courier New";
 }

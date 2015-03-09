@@ -47,7 +47,7 @@ var incrementTimeElapsed = function(timeStep) {
 
 var addWaveButton = document.getElementById('add_wave');
 
-addWaveButton.addEventListener('click', function() {
+var addWave = function() {
     var k = Math.PI*2/1;
     //"Drifting" bug fixed here. 
     //Divide by maxWavelength rather than by 1.
@@ -57,12 +57,18 @@ addWaveButton.addEventListener('click', function() {
     if(showResultant) {
 	refreshResultant();
     }
+    
+};
+
+addWaveButton.addEventListener('click', function() {
+    addWave();
 });
 
 
 var createTable = function() {
     var table = document.createElement('table');
     table.border = '1';
+
     var head = document.createElement('th');
     head.innerHTML = 'wave table';
     table.appendChild(head);
@@ -86,7 +92,6 @@ var refreshWaveDiv = function() {
 	//Regenerating the array index of every wave.
 	wavesArray[i].arrayIndex=i;
     }
-    console.log(tableRef.rows.length);
 };
 
 function Wave(a,k,omega,phi,color,d) {
@@ -275,7 +280,6 @@ function Wave(a,k,omega,phi,color,d) {
 	    if(event.keyCode == 13) {
 		var floatVal = eval(phiInput.value)*Math.PI;
 		waveObj.phi_slider.value=''+floatVal;
-		console.log('enter');
 		waveObj.edit(waveObj.a,waveObj.w, floatVal, phasorOriginPoint);
 	    }
 	});
@@ -573,8 +577,8 @@ resetButton.addEventListener('click', function() {
     }
     deleteResultant();
     resetPlayButton();
-    
     resetTimeElapsed();
+    refreshResultant();
 });
 
 var resetPlayButton = function() {
@@ -639,3 +643,23 @@ var refreshResultant = function() {
     line.add(resultant_dot);
     resultantPhasor = drawArrow(line, resultant_dot,phasorOriginPoint,'black',3);
 };
+
+
+
+var importButton = document.getElementById('import');
+importButton.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if(!file) {
+	return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+	var contents = e.target.result;
+	var div = document.getElementById('file_contents');
+	div.innerHTML = contents;
+	addWave();
+    };
+    
+    reader.readAsText(file);
+    
+});
