@@ -7,6 +7,7 @@
   </head>
   <body>
     <input type="file" id="import"></input>
+
     <button id="play">Play</button>
     <button id="reset">Reset</button>
     <button id="clear">Clear</button>
@@ -22,13 +23,14 @@
       <option value="resultant_only">Resultant only</option>
       <option value="individual_only">Individual only</option>
     </select>
+    <button id="export_waves">Export</button>
     <button id="add_wave">Add wave</button>
     <br>
 
     <canvas id="waveCanvas" resize="true" keepalive="true" ></canvas>
-    <div class="center" id="adder">
-    </div>
+    <div class="center" id="adder"> </div>
+    <div id="exportArea"></div>
+    
     <div id="footer"><h1><span id="time_elapsed">0</span> seconds</h1></div>
-    <div id="file_contents">file!</div>
   </body>
 </html>

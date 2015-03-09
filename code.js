@@ -60,6 +60,14 @@ var addWave = function() {
     
 };
 
+var addCustomWave = function(a,k,w,p,color,dir) {
+    wavesArray.push(new Wave(a,k,w,p,color,dir));
+    refreshWaveDiv();
+    if(showResultant) {
+	refreshResultant();
+    }
+};
+
 addWaveButton.addEventListener('click', function() {
     addWave();
 });
@@ -135,7 +143,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.reset=function() {
 	this.phiTimeDelta=0;
 	this.edit(this.a,this.w,this.phi,phasorOriginPoint);
-    }
+    };
+    
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
 	this.a = amplSliderVal;
@@ -165,7 +174,7 @@ function Wave(a,k,omega,phi,color,d) {
 	if(showResultant && !play) {
 	    refreshResultant();
 	}
-
+	console.log(this.toString());
     };
     this.editPhasor=function(origin) {
 	this.phasor.remove();
@@ -391,6 +400,15 @@ function Wave(a,k,omega,phi,color,d) {
     //Draw initial wave.
     this.edit(this.a,this.w,this.phi,phasorOriginPoint);
     this.waveDOM = this.createWaveDOM(this);
+    
+    this.toString = function() {
+	var str = ''+this.a+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
+	return str;
+    };
+
+    console.log(this.toString());
+
+
 };
 
 var phasorOrigin = new Path.Circle({
@@ -552,7 +570,8 @@ phasorTailsSelector.addEventListener('change', function() {
 
 
 var clearButton = document.getElementById('clear');
-clearButton.addEventListener('click', function() {
+
+var clearEverything = function() {
     for(var i=0; i<wavesArray.length; i++) {
 	wavesArray[i].wipe();
     }
@@ -562,7 +581,10 @@ clearButton.addEventListener('click', function() {
     refreshWaveDiv();
     resetPlayButton();
     resetTimeElapsed();
+};
 
+clearButton.addEventListener('click', function() {
+    clearEverything();
 });
 
 var deleteResultant = function() {
@@ -654,12 +676,38 @@ importButton.addEventListener('change', function(e) {
     }
     var reader = new FileReader();
     reader.onload = function(e) {
+	clearEverything();
 	var contents = e.target.result;
-	var div = document.getElementById('file_contents');
-	div.innerHTML = contents;
-	addWave();
+	var arr = contents.split("\n");
+	console.log(arr);
+	for(var i = 0; i < arr.length; i++) {
+	    var waveParts = arr[i].split(",");
+	    console.log(waveParts);
+	    var a = parseFloat(waveParts[0]);
+	    var k = parseFloat(waveParts[1]);
+	    var w = parseFloat(waveParts[2]);
+	    var p = parseFloat(waveParts[3]);
+	    var color = waveParts[4];
+	    var dir = waveParts[5];
+	    addCustomWave(a,k,w,p,color,dir);
+	}
     };
     
     reader.readAsText(file);
+    
+});
+
+var exportButton = document.getElementById('export_waves');
+exportButton.addEventListener('click', function() {
+    var exportArea = document.getElementById('exportArea');
+    if(wavesArray.length>0) {
+	var text = '';
+	for(var i = 0; i < wavesArray.length; i++) {
+	    text = text + wavesArray[i].toString() + '\r\n';
+	}
+	exportArea.innerHTML = text;
+    } else {
+	exportArea.innerHTML = 'No waves to export . . .';
+    }
     
 });
