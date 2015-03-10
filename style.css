@@ -1,3 +1,9 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+
 select::-ms-expand {
     display: none;
 }
@@ -9,15 +15,36 @@ select::-ms-expand {
     text-overflow: '';
 }
 
-#adder {
-    margin-left:70%;
-}
 
 #waveCanvas {
     border: 1px solid black;
     float: left;
     width: 70%;
 }
+
+
+#adderArea {
+    margin-left:70%;
+
+}
+
+
+.tables {
+    border-collapse: collapse;
+    height: 100%;
+    width: 30%;
+}
+
+td, th {
+    border: 1px solid #999;
+    padding: 0.5rem;
+}
+
+#exportArea {
+    margin-left: 70%;
+    border: 1px solid black;
+}
+
 #config {
     border: 1px solid black;
 }

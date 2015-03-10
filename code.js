@@ -45,45 +45,21 @@ var incrementTimeElapsed = function(timeStep) {
 
 };
 
-var addWaveButton = document.getElementById('add_wave');
 
-var addWave = function() {
-    var k = Math.PI*2/1;
-    //"Drifting" bug fixed here. 
-    //Divide by maxWavelength rather than by 1.
-    var w = Math.PI*2*velocityOfMedium/maxWavelength;
-    wavesArray.push(new Wave(1,k,w,0,'blue','-'));
-    refreshWaveDiv();
-    if(showResultant) {
-	refreshResultant();
-    }
-    
-};
-
-var addCustomWave = function(a,k,w,p,color,dir) {
-    wavesArray.push(new Wave(a,k,w,p,color,dir));
-    refreshWaveDiv();
-    if(showResultant) {
-	refreshResultant();
-    }
-};
-
-addWaveButton.addEventListener('click', function() {
-    addWave();
-});
 
 
 var createTable = function() {
     var table = document.createElement('table');
-    table.border = '1';
-
+    table.className = 'tables';
+    var thead = document.createElement('thead');
     var head = document.createElement('th');
     head.innerHTML = 'wave table';
-    table.appendChild(head);
+    thead.appendChild(head);
+    table.appendChild(thead);
     return table;
 };
 
-var waveEquationsDiv = document.getElementById('adder');
+var waveEquationsDiv = document.getElementById('adderArea');
 waveEquationsDiv.appendChild(createTable());
 var refreshWaveDiv = function() {
     //Clear it up.
@@ -91,15 +67,19 @@ var refreshWaveDiv = function() {
 	waveEquationsDiv.removeChild(waveEquationsDiv.lastChild);
     }
     var tableRef = createTable();
+    var tbody = document.createElement('tbody');
+    tableRef.appendChild(tbody);
     waveEquationsDiv.appendChild(tableRef);
     for(var i = 0; i < wavesArray.length; i++) {
 	var tr = document.createElement('tr');
-	tr.border='1';
-	tr.appendChild(wavesArray[i].waveDOM);
-	tableRef.appendChild(tr);
+	var td = document.createElement('td');
+	tr.appendChild(td);
+	td.appendChild(wavesArray[i].waveDOM);
+	tbody.appendChild(tr);
 	//Regenerating the array index of every wave.
 	wavesArray[i].arrayIndex=i;
     }
+    console.log(tableRef);
 };
 
 function Wave(a,k,omega,phi,color,d) {
@@ -707,3 +687,29 @@ exportButton.addEventListener('click', function() {
     }
     
 });
+
+var addWaveButton = document.getElementById('add_wave');
+addWaveButton.addEventListener('click', function() {
+    addWave();
+});
+
+var addWave = function() {
+    var k = Math.PI*2/1;
+    //"Drifting" bug fixed here. 
+    //Divide by maxWavelength rather than by 1.
+    var w = Math.PI*2*velocityOfMedium/maxWavelength;
+    wavesArray.push(new Wave(1,k,w,0,'blue','-'));
+    refreshWaveDiv();
+    if(showResultant) {
+	refreshResultant();
+    }
+};
+
+var addCustomWave = function(a,k,w,p,color,dir) {
+    wavesArray.push(new Wave(a,k,w,p,color,dir));
+    refreshWaveDiv();
+    if(showResultant) {
+	refreshResultant();
+    }
+};
+
