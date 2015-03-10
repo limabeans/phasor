@@ -61,6 +61,7 @@ var createTable = function() {
 
 var waveEquationsDiv = document.getElementById('adderArea');
 waveEquationsDiv.appendChild(createTable());
+
 var refreshWaveDiv = function() {
     //Clear it up.
     while (waveEquationsDiv.hasChildNodes()) {
@@ -74,6 +75,7 @@ var refreshWaveDiv = function() {
 	var tr = document.createElement('tr');
 	var td = document.createElement('td');
 	tr.appendChild(td);
+	wavesArray[i].refreshWaveDOM();
 	td.appendChild(wavesArray[i].waveDOM);
 	tbody.appendChild(tr);
 	//Regenerating the array index of every wave.
@@ -83,12 +85,25 @@ var refreshWaveDiv = function() {
 };
 
 function Wave(a,k,omega,phi,color,d) {
+    this.color_dropdown = null;
+    this.amp_span = null;
+    this.k_span = null;
+    this.dir_dropdown = null;
+    this.omega_span = null;
+    this.phi_input = null;
+
+    this.amp_slider = null;
+    this.f_slider = null;
+    this.phi_slider = null;
+
     this.arrayIndex=-1;
     this.a = a;
     this.lambda = maxWavelength / 1;
-    this.k_span = null;
+    //this.k = 2*Math.PI / this.lambda;
+    //this.k = k;
+    
     this.omega=omega;
-    this.omega_span = null;
+
     this.phiTimeDelta=0;
     this.phi = phi;
     this.w=1;
@@ -220,6 +235,7 @@ function Wave(a,k,omega,phi,color,d) {
 	var ampl_span = document.createElement('span');
 	waveObj.a_span=ampl_span;
 	ampl_span.innerHTML = '1.00';
+	waveObj.amp_span=ampl_span;
 	eqn.appendChild(ampl_span);
 	//sin(
 	var sin_txt = document.createTextNode('sin(');
@@ -294,6 +310,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    waveObj.refresh();
 	});
 	sliders.appendChild(a_slider);
+	waveObj.amp_slider = a_slider;
 
 	var num_wavelengths = document.createElement('span');
 	num_wavelengths.innerHTML = 'f';
@@ -316,6 +333,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi,phasorOriginPoint);
 	});
 	sliders.appendChild(num_wavelengths_slider);
+	waveObj.f_slider = num_wavelengths_slider;
 
 	var phi = document.createElement('span');
 	phi.innerHTML='&phi;';
@@ -330,6 +348,7 @@ function Wave(a,k,omega,phi,color,d) {
 	phi_slider.value='0';
 	sliders.appendChild(phi_slider);
 	waveObj.phi_slider = phi_slider;
+
 	phi_slider.addEventListener('input', function() {
 	    var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
 	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
@@ -357,7 +376,6 @@ function Wave(a,k,omega,phi,color,d) {
 	    refreshResultant();
 	});
 
-
 	newline.innerHTML='<br>';
 	var sliders = this.createWaveSlidersDOM(this);
 	wave.appendChild(colorDropdown);
@@ -367,10 +385,20 @@ function Wave(a,k,omega,phi,color,d) {
 
 	wave.appendChild(newline);
 	wave.appendChild(sliders);
-
-
 	return wave;
     };
+    
+    this.refreshWaveDOM = function() {
+	this.amp_span.innerHTML = this.a;
+	//this.k_span.innerHTML = this.k;
+	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(3);
+	this.amp_slider.value = this.a;
+	//this.f_slider.value = this.w;
+	var phi_scaled = this.phi / Math.PI;
+	this.phi_input.value = phi_scaled;
+	this.phi_slider.value = this.phi;
+    };
+    
 
 
     //Draw initial wave.
@@ -383,7 +411,6 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
     console.log(this.toString());
-
 
 };
 
@@ -557,6 +584,7 @@ var clearEverything = function() {
     refreshWaveDiv();
     resetPlayButton();
     resetTimeElapsed();
+    exportArea.innerHTML = '';
 };
 
 clearButton.addEventListener('click', function() {
@@ -665,7 +693,12 @@ importButton.addEventListener('change', function(e) {
 	    var p = parseFloat(waveParts[3]);
 	    var color = waveParts[4];
 	    var dir = waveParts[5];
-	    addCustomWave(a,k,w,p,color,dir);
+	    if(!isNaN(a) && !isNaN(k) && !isNaN(w) &&
+	       !isNaN(p)) {
+		addCustomWave(a,k,w,p,color,dir);
+		refreshWaveDiv();
+		refreshResultant();
+	    }
 	}
     };
     
@@ -674,8 +707,8 @@ importButton.addEventListener('change', function(e) {
 });
 
 var exportButton = document.getElementById('export_waves');
+var exportArea = document.getElementById('exportArea');
 exportButton.addEventListener('click', function() {
-    var exportArea = document.getElementById('exportArea');
     if(wavesArray.length>0) {
 	var text = '';
 	for(var i = 0; i < wavesArray.length; i++) {
@@ -694,22 +727,26 @@ addWaveButton.addEventListener('click', function() {
 });
 
 var addWave = function() {
-    var k = Math.PI*2/1;
-    //"Drifting" bug fixed here. 
-    //Divide by maxWavelength rather than by 1.
-    var w = Math.PI*2*velocityOfMedium/maxWavelength;
-    wavesArray.push(new Wave(1,k,w,0,'blue','-'));
-    refreshWaveDiv();
-    if(showResultant) {
-	refreshResultant();
+    if(wavesArray.length<5) {
+	var k = Math.PI*2/1;
+	//"Drifting" bug fixed here. 
+	//Divide by maxWavelength rather than by 1.
+	var w = Math.PI*2*velocityOfMedium/maxWavelength;
+	wavesArray.push(new Wave(1,k,w,0,'blue','-'));
+	refreshWaveDiv();
+	if(showResultant) {
+	    refreshResultant();
+	}
     }
 };
 
 var addCustomWave = function(a,k,w,p,color,dir) {
-    wavesArray.push(new Wave(a,k,w,p,color,dir));
-    refreshWaveDiv();
-    if(showResultant) {
-	refreshResultant();
+    if(wavesArray.length<5) {
+	wavesArray.push(new Wave(a,k,w,p,color,dir));
+	refreshWaveDiv();
+	if(showResultant) {
+	    refreshResultant();
+	}
     }
 };
 
