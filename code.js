@@ -105,16 +105,12 @@ var refreshWaveDiv = function() {
 function Wave(a,k,omega,phi,color,d) {
     this.arrayIndex=-1;
     this.a = a;
-    this.a_span = null;
     this.lambda = maxWavelength / 1;
     this.k_span = null;
     this.omega=omega;
     this.omega_span = null;
     this.phiTimeDelta=0;
     this.phi = phi;
-    this.phi_slider = null;
-    this.phi_span = null;
-    this.phi_input = null;
     this.w=1;
     this.color = color;
     this.dir=d;
