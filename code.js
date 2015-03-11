@@ -462,20 +462,21 @@ refreshWaves = function() {
     //This iterates through the wavesArray and dynamically updates/redraws 
     //all of the waves onto the screen.
     for(var i = 0; i <wavesArray.length; i++) {
-	console.log('before anything happens'+wavesArray[i].toString());
 	var omega = parseFloat(wavesArray[i].omega);
-	if(wavesArray[i].dir==='-') {
-	    wavesArray[i].phiTimeDelta -= omega*timeStep;
-	} else {
-	    wavesArray[i].phiTimeDelta += omega*timeStep;
+	//Shouldn't simulate timeStep unless your on play!
+	if(play) {
+	    if(wavesArray[i].dir==='-') {
+		wavesArray[i].phiTimeDelta -= omega*timeStep;
+	    } else {
+		wavesArray[i].phiTimeDelta += omega*timeStep;
+	    }
 	}
-	console.log('plus some stuff'+wavesArray[i].toString());
 	if(showIndividual) {
 	    wavesArray[i].setVisible();
 	} else {
 	    wavesArray[i].setInvisible();
 	}
-	console.log('3hasd'+wavesArray[i].toString());
+
 	//This is the part where we actually draw to the screen.
 	//How we edit the waves depends on whether we want the phasors to be 
 	//all tails at origin, or vector added.
@@ -483,15 +484,14 @@ refreshWaves = function() {
 	if(tails_at_origin) {
 	    wavesArray[i].edit(wavesArray[i].amplitude,
 			       wavesArray[i].frequency,wavesArray[i].phi,phasorOriginPoint);
-	    console.log('4kZJ'+wavesArray[i].toString());
 	} else {
 	    if(i==0) {
 		//The first phasor should really be at the origin.
-		wavesArray[i].edit(wavesArray[i].a,
-				   wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+		wavesArray[i].edit(wavesArray[i].amplitude,
+				   wavesArray[i].frequency,wavesArray[i].phi,phasorOriginPoint);
 	    } else {
-		wavesArray[i].edit(wavesArray[i].a,
-				   wavesArray[i].w,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
+		wavesArray[i].edit(wavesArray[i].amplitude,
+				   wavesArray[i].frequency,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
 	    }
 	}
     }    
