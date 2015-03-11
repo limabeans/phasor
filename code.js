@@ -27,6 +27,48 @@ var showResultant=true;
 var setIntervalInitialized=false;
 var setIntervalVariable = null;
 
+//Draw the outline to screen.
+var phasorOrigin = new Path.Circle({
+    center:[zeroX/2,zeroY],
+    radius:5,
+    strokeColor:'purple'
+});
+
+var amplTick = new Path.Line({
+    from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
+    to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
+    strokeColor: 'green'
+});
+
+var wavelengthTick = new Path.Line({
+    from: [zeroX + pixelWavelength/2, -10 + zeroY],
+    to: [zeroX + pixelWavelength/2 ,10 + zeroY],
+    strokeColor: 'red'
+    
+});
+var phasorXaxis = new Path.Line({
+    from: [0, zeroY],
+    to: [canvas.height, zeroY],
+    strokeColor: 'black'
+});
+var phasorYaxis = new Path.Line({
+    from: [zeroX/2,0],
+    to: [zeroX/2,canvas.height],
+    strokeColor: 'black'
+});
+
+var dividerLine = new Path.Line({
+    from: [canvas.height,0],
+    to: [canvas.height, canvas.height],
+    strokeColor: 'purple'
+});
+var midwayLine = new Path.Line({
+    from: [canvas.height,zeroY],
+    to: [canvas.width, zeroY],
+    strokeColor: 'black'
+});
+
+
 
 var calculateWavelength = function(frequency) {
     return maxWavelength / frequency;
@@ -40,8 +82,6 @@ var calculateOmegaFromK = function(k) {
 var calculateFrequencyFromOmega = function(omega) {
     return omega/(2*Math.PI);
 };
-
-
 
 
 var time_elapsed = document.getElementById('time_elapsed');
@@ -96,7 +136,6 @@ var refreshWaveDiv = function() {
 	//Regenerating the array index of every wave.
 	wavesArray[i].arrayIndex=i;
     }
-    console.log(tableRef);
 };
 
 function Wave(a,k,omega,phi,color,d) {
@@ -112,12 +151,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.f_slider = null;
     this.phi_slider = null;
 
-    //Using arrayIndex to support deletion of waves.
-    this.arrayIndex=-1;
-
     //Wave's instance variables.
     this.amplitude = a;
-    //this.frequency=DEFAULT_FREQUENCY; //1
     this.k = k;
     this.omega=omega;
     this.phi = phi;
@@ -126,6 +161,7 @@ function Wave(a,k,omega,phi,color,d) {
     //Other fields related to displaying.
     //TimeDelta used for moving the wave on the screen.
     this.phiTimeDelta=0;
+    this.arrayIndex=-1;
     this.color = color;
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -154,7 +190,6 @@ function Wave(a,k,omega,phi,color,d) {
 	this.phiTimeDelta=0;
 	this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
     };
-    
 
     this.edit=function(amplSliderVal, frequencySliderVal,phiSliderVal,pseudoOrigin) {
 
@@ -164,7 +199,8 @@ function Wave(a,k,omega,phi,color,d) {
 	this.phi = phiSliderVal;
 	this.k = 2*Math.PI / calculateWavelength(this.frequency);
 	this.omega = velocityOfMedium * this.k;
-	
+
+	//Wipe out the wave.
 	this.path.removeSegments();
 	for(var i = 0; i <= pointsPerWave; i++) {
 	    var scaleFraction = i/pointsPerWave;
@@ -181,15 +217,14 @@ function Wave(a,k,omega,phi,color,d) {
 	this.path.smooth();
 	this.editPhasor(pseudoOrigin);
 
-
 	//Redraw the resultant wave.
 	//This case only happens when the animation is paused,
 	//or else things will lag, because double drawing.
 	if(showResultant && !play) {
 	    refreshResultant();
 	}
-	console.log(this.toString());
     };
+
     this.editPhasor=function(origin) {
 	this.phasor.remove();
 	var line = new Path();
@@ -220,179 +255,6 @@ function Wave(a,k,omega,phi,color,d) {
 
 
 
-    this.createWaveEqn = function(waveObj) {
-	var eqn = document.createElement('span');
-	//y(x,t) =
-	var y_x_t = document.createTextNode('y(x,t) = ');
-	eqn.appendChild(y_x_t);
-	//[1.00]
-	var ampl_span = document.createElement('span');
-	waveObj.a_span=ampl_span;
-	ampl_span.innerHTML = '1.00';
-	waveObj.amp_span=ampl_span;
-	eqn.appendChild(ampl_span);
-	//sin(
-	var sin_txt = document.createTextNode('sin(');
-	eqn.appendChild(sin_txt);
-	//[6.28]
-	var k_span = document.createElement('span');
-	//k_span.innerHTML='6.28';
-	k_span.innerHTML=parseFloat(waveObj.k).toFixed(3);
-	waveObj.k_span = k_span;
-	eqn.appendChild(k_span);
-	//x
-	var x_txt = document.createTextNode('x ');
-	eqn.appendChild(x_txt);
-	//[-+]
-	var dir_dropdown = document.createElement('select');
-	var minus = document.createElement('option');
-	minus.text='-'; minus.value='-';
-	dir_dropdown.add(minus);
-	var plus = document.createElement('option');
-	plus.text='+'; plus.value='+';
-	dir_dropdown.add(plus);
-	dir_dropdown.addEventListener('change', function() {
-	    waveObj.dir=dir_dropdown.value;
-	});
-	eqn.appendChild(dir_dropdown);
-	//[62.83]
-	var omega_span = document.createElement('span');
-	omega_span.innerHTML='62.83';
-	waveObj.omega_span=omega_span;
-	//NaN bug here???
-	//waveObj.omega=omega_span.value;
-	eqn.appendChild(omega_span);
-	//t +
-	var t_plus_txt = document.createTextNode('t + ');
-	eqn.appendChild(t_plus_txt);
-	//[0]
-	var phiInput = document.createElement('input');
-	phiInput.value='0.000';
-	phiInput.size='4';
-	waveObj.phi_input = phiInput;
-	eqn.appendChild(phiInput);
-	phiInput.addEventListener('keydown', function() {
-	    //[enter] 
-	    if(event.keyCode == 13) {
-		var floatVal = eval(phiInput.value)*Math.PI;
-		waveObj.phi_slider.value=''+floatVal;
-		waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
-	    }
-	});
-
-	//pi)
-	var end_paren_txt = document.createTextNode('\u03C0)');
-	eqn.appendChild(end_paren_txt);
-	
-	return eqn;
-    };
-
-    this.createWaveSlidersDOM = function(waveObj) {
-	var sliders = document.createElement('span');
-	var alpha = document.createElement('span');
-	alpha.innerHTML='&alpha;';
-	sliders.appendChild(alpha);
-
-	var a_slider = document.createElement('input');
-	a_slider.type='range';
-	a_slider.className='sliders'; 
-	a_slider.min='0';
-	a_slider.max='2';
-	a_slider.step='0.01';
-	a_slider.addEventListener('input', function() {
-	    waveObj.amplitude=a_slider.value;
-	    waveObj.a_span.innerHTML=''+a_slider.value;
-	    waveObj.refresh();
-	});
-	sliders.appendChild(a_slider);
-	waveObj.amp_slider = a_slider;
-
-	var num_wavelengths = document.createElement('span');
-	num_wavelengths.innerHTML = 'f';
-	sliders.appendChild(num_wavelengths);
-
-	var frequency_slider = document.createElement('input');
-	frequency_slider.type='range';
-	frequency_slider.className='sliders';
-	frequency_slider.min='.5';
-	frequency_slider.max='10';
-	frequency_slider.step='.1';
-	frequency_slider.value=''+waveObj.frequency;
-
-	frequency_slider.addEventListener('input', function() {
-	    var lambda = calculateWavelength(frequency_slider.value);
-	    var k = 2*Math.PI/lambda;
-	    waveObj.k_span.innerHTML = parseFloat(k).toFixed(3);
-	    var omega = calculateOmegaFromK(k);
-	    waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
-	    waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
-	});
-
-
-	sliders.appendChild(frequency_slider);
-	waveObj.f_slider = frequency_slider;
-
-	var phi = document.createElement('span');
-	phi.innerHTML='&phi;';
-	sliders.appendChild(phi);
-
-	var phi_slider = document.createElement('input');
-	phi_slider.type='range';
-	phi_slider.className='sliders';
-	phi_slider.min='-6.283185307179586';
-	phi_slider.max='6.283185307179586';
-	phi_slider.step='0.00000001';
-	phi_slider.value='0';
-	sliders.appendChild(phi_slider);
-	waveObj.phi_slider = phi_slider;
-
-	phi_slider.addEventListener('input', function() {
-	    var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
-	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
-	    waveObj.phi_input.value=''+scaleByPi;
-	    waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
-	});
-
-
-	var space = document.createElement('span');
-	space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	sliders.appendChild(space);
-
-	var deleteButton = document.createElement('button');
-	deleteButton.innerHTML='X';
-	deleteButton.addEventListener('click', function() {
-	    waveObj.wipe();
-	    wavesArray.splice(waveObj.arrayIndex,1);
-	    refreshWaveDiv();
-	    refreshResultant();
-	    clearExportArea();
-	});
-	
-	sliders.appendChild(deleteButton);
-
-
-	return sliders;
-    };
-
-
-    this.createWaveDOM = function(waveObj) {
-	var wave = document.createElement('div');
-	
-
-	var colorDropdown = createColorDropdown(this);
-	var eqn = this.createWaveEqn(this);
-	var newline = document.createElement('span');
-
-
-	newline.innerHTML='<br>';
-	var sliders = this.createWaveSlidersDOM(this);
-	wave.appendChild(colorDropdown);
-	wave.appendChild(eqn);
-
-	wave.appendChild(newline);
-	wave.appendChild(sliders);
-	return wave;
-    };
     
     this.refreshWaveDOM = function() {
 	this.amp_span.innerHTML = this.amplitude;
@@ -408,56 +270,15 @@ function Wave(a,k,omega,phi,color,d) {
 
     //Draw initial wave.
     this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
-    this.waveDOM = this.createWaveDOM(this);
+    this.waveDOM = createWaveDOM(this);
     
     this.toString = function() {
 	var str = ''+this.amplitude+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
 	return str;
     };
-
-    console.log(this.toString());
-
 };
 
-var phasorOrigin = new Path.Circle({
-    center:[zeroX/2,zeroY],
-    radius:5,
-    strokeColor:'purple'
-});
 
-var amplTick = new Path.Line({
-    from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
-    to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
-    strokeColor: 'green'
-});
-
-var wavelengthTick = new Path.Line({
-    from: [zeroX + pixelWavelength/2, -10 + zeroY],
-    to: [zeroX + pixelWavelength/2 ,10 + zeroY],
-    strokeColor: 'red'
-    
-});
-var phasorXaxis = new Path.Line({
-    from: [0, zeroY],
-    to: [canvas.height, zeroY],
-    strokeColor: 'black'
-});
-var phasorYaxis = new Path.Line({
-    from: [zeroX/2,0],
-    to: [zeroX/2,canvas.height],
-    strokeColor: 'black'
-});
-
-var dividerLine = new Path.Line({
-    from: [canvas.height,0],
-    to: [canvas.height, canvas.height],
-    strokeColor: 'purple'
-});
-var midwayLine = new Path.Line({
-    from: [canvas.height,zeroY],
-    to: [canvas.width, zeroY],
-    strokeColor: 'black'
-});
 
 
 function onFrame(event) {
@@ -483,7 +304,6 @@ function onFrame(event) {
 };
 
 refreshWaves = function() {
-    console.log('refresh');
     //This iterates through the wavesArray and dynamically updates/redraws 
     //all of the waves onto the screen.
     for(var i = 0; i <wavesArray.length; i++) {
@@ -700,10 +520,8 @@ importButton.addEventListener('change', function(e) {
 	clearEverything();
 	var contents = e.target.result;
 	var arr = contents.split("\n");
-	console.log(arr);
 	for(var i = 0; i < arr.length; i++) {
 	    var waveParts = arr[i].split(",");
-	    console.log(waveParts);
 	    var a = parseFloat(waveParts[0]);
 	    var k = parseFloat(waveParts[1]);
 	    var w = parseFloat(waveParts[2]);
@@ -815,3 +633,168 @@ createColorDropdown = function(waveObj) {
 };
 
 
+createWaveEqn = function(waveObj) {
+    var eqn = document.createElement('span');
+    //y(x,t) =
+    var y_x_t = document.createTextNode('y(x,t) = ');
+    eqn.appendChild(y_x_t);
+    //[1.00]
+    var ampl_span = document.createElement('span');
+    waveObj.a_span=ampl_span;
+    ampl_span.innerHTML = '1.00';
+    waveObj.amp_span=ampl_span;
+    eqn.appendChild(ampl_span);
+    //sin(
+    var sin_txt = document.createTextNode('sin(');
+    eqn.appendChild(sin_txt);
+    //[6.28]
+    var k_span = document.createElement('span');
+    //k_span.innerHTML='6.28';
+    k_span.innerHTML=parseFloat(waveObj.k).toFixed(3);
+    waveObj.k_span = k_span;
+    eqn.appendChild(k_span);
+    //x
+    var x_txt = document.createTextNode('x ');
+    eqn.appendChild(x_txt);
+    //[-+]
+    var dir_dropdown = document.createElement('select');
+    var minus = document.createElement('option');
+    minus.text='-'; minus.value='-';
+    dir_dropdown.add(minus);
+    var plus = document.createElement('option');
+    plus.text='+'; plus.value='+';
+    dir_dropdown.add(plus);
+    dir_dropdown.addEventListener('change', function() {
+	waveObj.dir=dir_dropdown.value;
+    });
+    eqn.appendChild(dir_dropdown);
+    //[62.83]
+    var omega_span = document.createElement('span');
+    omega_span.innerHTML='62.83';
+    waveObj.omega_span=omega_span;
+    //NaN bug here???
+    //waveObj.omega=omega_span.value;
+    eqn.appendChild(omega_span);
+    //t +
+    var t_plus_txt = document.createTextNode('t + ');
+    eqn.appendChild(t_plus_txt);
+    //[0]
+    var phiInput = document.createElement('input');
+    phiInput.value='0.000';
+    phiInput.size='4';
+    waveObj.phi_input = phiInput;
+    eqn.appendChild(phiInput);
+    phiInput.addEventListener('keydown', function() {
+	//[enter] 
+	if(event.keyCode == 13) {
+	    var floatVal = eval(phiInput.value)*Math.PI;
+	    waveObj.phi_slider.value=''+floatVal;
+	    waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
+	}
+    });
+
+    //pi)
+    var end_paren_txt = document.createTextNode('\u03C0)');
+    eqn.appendChild(end_paren_txt);
+    
+    return eqn;
+};
+
+createWaveSlidersDOM = function(waveObj) {
+    var sliders = document.createElement('span');
+    var alpha = document.createElement('span');
+    alpha.innerHTML='&alpha;';
+    sliders.appendChild(alpha);
+
+    var a_slider = document.createElement('input');
+    a_slider.type='range';
+    a_slider.className='sliders'; 
+    a_slider.min='0';
+    a_slider.max='2';
+    a_slider.step='0.01';
+    a_slider.addEventListener('input', function() {
+	waveObj.amplitude=a_slider.value;
+	waveObj.a_span.innerHTML=''+a_slider.value;
+	waveObj.refresh();
+    });
+    sliders.appendChild(a_slider);
+    waveObj.amp_slider = a_slider;
+
+    var num_wavelengths = document.createElement('span');
+    num_wavelengths.innerHTML = 'f';
+    sliders.appendChild(num_wavelengths);
+
+    var frequency_slider = document.createElement('input');
+    frequency_slider.type='range';
+    frequency_slider.className='sliders';
+    frequency_slider.min='.5';
+    frequency_slider.max='10';
+    frequency_slider.step='.1';
+    frequency_slider.value=''+waveObj.frequency;
+
+    frequency_slider.addEventListener('input', function() {
+	var lambda = calculateWavelength(frequency_slider.value);
+	var k = 2*Math.PI/lambda;
+	waveObj.k_span.innerHTML = parseFloat(k).toFixed(3);
+	var omega = calculateOmegaFromK(k);
+	waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
+	waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
+    });
+
+
+    sliders.appendChild(frequency_slider);
+    waveObj.f_slider = frequency_slider;
+
+    var phi = document.createElement('span');
+    phi.innerHTML='&phi;';
+    sliders.appendChild(phi);
+
+    var phi_slider = document.createElement('input');
+    phi_slider.type='range';
+    phi_slider.className='sliders';
+    phi_slider.min='-6.283185307179586';
+    phi_slider.max='6.283185307179586';
+    phi_slider.step='0.00000001';
+    phi_slider.value='0';
+    sliders.appendChild(phi_slider);
+    waveObj.phi_slider = phi_slider;
+
+    phi_slider.addEventListener('input', function() {
+	var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
+	scaleByPi = parseFloat(scaleByPi).toFixed(3);
+	waveObj.phi_input.value=''+scaleByPi;
+	waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
+    });
+
+
+    var space = document.createElement('span');
+    space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    sliders.appendChild(space);
+
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML='X';
+    deleteButton.addEventListener('click', function() {
+	waveObj.wipe();
+	wavesArray.splice(waveObj.arrayIndex,1);
+	refreshWaveDiv();
+	refreshResultant();
+	clearExportArea();
+    });
+    
+    sliders.appendChild(deleteButton);
+    return sliders;
+};
+
+createWaveDOM = function(waveObj) {
+    var wave = document.createElement('div');
+    var colorDropdown = createColorDropdown(waveObj);
+    var eqn = createWaveEqn(waveObj);
+    var newline = document.createElement('span');
+    newline.innerHTML='<br>';
+    var sliders = createWaveSlidersDOM(waveObj);
+    wave.appendChild(colorDropdown);
+    wave.appendChild(eqn);
+    wave.appendChild(newline);
+    wave.appendChild(sliders);
+    return wave;
+};
