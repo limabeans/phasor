@@ -14,7 +14,6 @@ var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
 var currentTime=0;
 var timeStep = 0.001;
-
 var wavesArray=[];
 
 var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
@@ -26,6 +25,7 @@ var showIndividual=true;
 var showResultant=true;
 var setIntervalInitialized=false;
 var setIntervalVariable = null;
+
 
 //Draw the outline to screen.
 var phasorOrigin = new Path.Circle({
@@ -68,13 +68,15 @@ var midwayLine = new Path.Line({
     strokeColor: 'black'
 });
 
-
-
+//Calculate helpers.
 var calculateWavelength = function(frequency) {
     return maxWavelength / frequency;
 };
 var calcluateKFromOmega = function(omega) {
     return omega / velocityOfMedium;
+};
+var calculateKFromFrequency = function(frequency) {
+    return 2*Math.PI / calculateWavelength(frequency);
 };
 var calculateOmegaFromK = function(k) {
     return k * velocityOfMedium;
@@ -83,7 +85,16 @@ var calculateFrequencyFromOmega = function(omega) {
     return omega/(2*Math.PI);
 };
 
+var DEFAULT_AMPL = 1;
+var DEFAULT_K = Math.PI*2/maxWavelength;
+var DEFAULT_OMEGA = calculateOmegaFromK(DEFAULT_K);
+var DEFAULT_FREQUENCY = 1;
+var DEFAULT_PHI = 0;
+var DEFAULT_COLOR = 'blue';
+var DEFAULT_DIR = '-';
 
+
+//Handling the timer.
 var time_elapsed = document.getElementById('time_elapsed');
 var resetTimeElapsed = function() {
     currentTime=0;
@@ -92,7 +103,6 @@ var resetTimeElapsed = function() {
     time_elapsed.innerHTML='0';
 
 };
-
 var incrementTimeElapsed = function(timeStep) {
     var scaledTime = .1;
     currentTime+=scaledTime;
@@ -100,9 +110,10 @@ var incrementTimeElapsed = function(timeStep) {
 	var textTime = ''+parseFloat(currentTime).toFixed(0);
 	time_elapsed.innerHTML=textTime;
     }
-
 };
 
+
+//Divs.
 var createTable = function() {
     var table = document.createElement('table');
     table.className = 'tables';
@@ -138,6 +149,8 @@ var refreshWaveDiv = function() {
     }
 };
 
+
+//Wave constructor.
 function Wave(a,k,omega,phi,color,d) {
     //DOM element reference variables.
     //Need these to support import/export.
@@ -197,11 +210,11 @@ function Wave(a,k,omega,phi,color,d) {
 	this.amplitude = amplSliderVal;
 	this.frequency = frequencySliderVal;
 	this.phi = phiSliderVal;
-	this.k = 2*Math.PI / calculateWavelength(this.frequency);
-	this.omega = velocityOfMedium * this.k;
+	this.k = calculateKFromFrequency(this.frequency);
+	this.omega = calculateOmegaFromK(this.k);
 
-	//Wipe out the wave.
 	this.path.removeSegments();
+	//Iterate through and re-add points to Wave path.
 	for(var i = 0; i <= pointsPerWave; i++) {
 	    var scaleFraction = i/pointsPerWave;
 	    var deltaX = scaleFraction*pixelWavelength;
@@ -225,6 +238,7 @@ function Wave(a,k,omega,phi,color,d) {
 	}
     };
 
+    //Helper method for edit to editPhasor. Never called outside of Wave.
     this.editPhasor=function(origin) {
 	this.phasor.remove();
 	var line = new Path();
@@ -245,6 +259,7 @@ function Wave(a,k,omega,phi,color,d) {
 	}
     };
     
+    //Simply redraws everything.
     this.refresh = function() {
 	this.path.remove();
     	this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -254,8 +269,7 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
 
-
-    
+    //Need to implement this for import/export feature.
     this.refreshWaveDOM = function() {
 	this.amp_span.innerHTML = this.amplitude;
 	//this.k_span.innerHTML = this.k;
@@ -265,22 +279,20 @@ function Wave(a,k,omega,phi,color,d) {
 	this.phi_input.value = phi_scaled;
 	this.phi_slider.value = this.phi;
     };
-    
 
-
-    //Draw initial wave.
-    this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
-    this.waveDOM = createWaveDOM(this);
-    
     this.toString = function() {
 	var str = ''+this.amplitude+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
 	return str;
     };
+
+    
+    //Draw initial wave.
+    this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
+    this.waveDOM = createWaveDOM(this);
+    
 };
 
-
-
-
+//The loop.
 function onFrame(event) {
     if(play) {
 	if(!setIntervalInitialized) {
@@ -289,17 +301,13 @@ function onFrame(event) {
 		    currentTime+=1;
 		    time_elapsed.innerHTML=''+currentTime;
 		}, 1000/speedSlider.value);
-
 		setIntervalInitialized=true;
 	    }
 	}
-	
 	refreshWaves();
-	
 	if(showResultant) {
 	    refreshResultant();
 	}
-
     }
 };
 
@@ -340,137 +348,10 @@ refreshWaves = function() {
 				   wavesArray[i].frequency,wavesArray[i].phi,wavesArray[i-1].offsetPoint);
 	    }
 	}
-    }    
-};
-
-var drawArrow = function(phasorPath, offsetPoint, referenceOrigin,color,width) {
-    var arrowVector = (offsetPoint-referenceOrigin).normalize(10);
-    var group = new Group([
-	phasorPath,
-	new Path([
-	    offsetPoint+arrowVector.rotate(-135),
-	    offsetPoint,
-	    offsetPoint+arrowVector.rotate(135)
-	])
-    ]);
-    group.strokeColor=color;
-    group.strokeWidth=width;
-    return group;
-};
-
-var playButton = document.getElementById('play');
-playButton.addEventListener('click', function() {
-    play=!play;
-    if(!play) { //Pause.
-	clearInterval(setIntervalVariable);
-	setIntervalInitialized=false;
     }
-    if(playButton.innerHTML === 'Play') {
-	playButton.innerHTML = 'Pause';
-    } else {
-	playButton.innerHTML = 'Play';
-    }
-});
 
-var speedSlider = document.getElementById('speed');
-var speed_val = document.getElementById('speed_val');
-speedSlider.addEventListener('input', function() {
-    var speedVal = speedSlider.value;
-    var scaled = parseFloat(speedVal).toFixed(3);
-    speed_val.innerHTML=''+scaled;
-    speedVal = parseFloat(speedVal);
-    //Scale the timeStep downwards.
-    timeStep=speedVal/1000;
-    
-    //Modifying the timer on the screen.
-    if(play) {
-	clearInterval(setIntervalVariable);
-	if(speedVal!==0) {
-	    setIntervalVariable = setInterval(function() {
-		currentTime+=1;
-		time_elapsed.innerHTML=''+currentTime;
-	    }, 1000/speedVal);
-	    setIntervalInitialized=true;
-	}
-    }
-});
-
-var phasorTailsSelector = document.getElementById('phasor_tails');
-phasorTailsSelector.addEventListener('change', function() {
-    tails_at_origin=!tails_at_origin;
-    refreshWaves();
-});
-
-
-var clearButton = document.getElementById('clear');
-
-var clearEverything = function() {
-    for(var i=0; i<wavesArray.length; i++) {
-	wavesArray[i].wipe();
-    }
-    deleteResultant();
-    //lol idk if deleting an array like this is good practice
-    wavesArray = [];
-    refreshWaveDiv();
-    resetPlayButton();
-    resetTimeElapsed();
-    clearExportArea();
-};
-
-
-var clearExportArea = function() {
-    exportArea.innerHTML = '';    
-};
-clearButton.addEventListener('click', function() {
-    clearEverything();
-});
-
-var deleteResultant = function() {
-    resultantWave.removeSegments();
-    resultantPhasor.remove();
-};
-
-var resetButton = document.getElementById('reset');
-resetButton.addEventListener('click', function() {
-    for(var i=0; i<wavesArray.length; i++) {
-	wavesArray[i].reset();
-    }
-    deleteResultant();
-    resetPlayButton();
-    resetTimeElapsed();
     refreshResultant();
-    clearExportArea();
-});
-
-var resetPlayButton = function() {
-    //Modify the play/pause button manually.
-    if(play) {
-	play=!play;
-	if(playButton.innerHTML === 'Play') {
-	    playButton.innerHTML = 'Pause';
-	} else {
-	    playButton.innerHTML = 'Play';
-	}
-    }
 };
-
-var wavesToShowSelector = document.getElementById('wave_option');
-wavesToShowSelector.addEventListener('change', function() {
-    if(wavesToShowSelector.value === 'show_all') {
-	showIndividual=true;
-	showResultant=true;
-    }
-    if(wavesToShowSelector.value === 'resultant_only') {
-	showIndividual=false;
-	showResultant=true;
-    }
-    if(wavesToShowSelector.value === 'individual_only') {
-	showIndividual=true;
-	deleteResultant();
-	showResultant=false;
-    }
-    refreshWaves();
-});
 
 
 var refreshResultant = function() {
@@ -506,6 +387,168 @@ var refreshResultant = function() {
 	resultantPhasor = drawArrow(line, resultant_dot,phasorOriginPoint,'black',3);
     }
 };
+
+
+var drawArrow = function(phasorPath, offsetPoint, referenceOrigin,color,width) {
+    var arrowVector = (offsetPoint-referenceOrigin).normalize(10);
+    var group = new Group([
+	phasorPath,
+	new Path([
+	    offsetPoint+arrowVector.rotate(-135),
+	    offsetPoint,
+	    offsetPoint+arrowVector.rotate(135)
+	])
+    ]);
+    group.strokeColor=color;
+    group.strokeWidth=width;
+    return group;
+};
+
+//buttons
+//Button #1. PLAY button.
+var playButton = document.getElementById('play');
+playButton.addEventListener('click', function() {
+    play=!play;
+    if(!play) { //Pause.
+	clearInterval(setIntervalVariable);
+	setIntervalInitialized=false;
+    }
+    if(playButton.innerHTML === 'Play') {
+	playButton.innerHTML = 'Pause';
+    } else {
+	playButton.innerHTML = 'Play';
+    }
+});
+//Button #2. CLEAR button.
+var clearButton = document.getElementById('clear');
+clearButton.addEventListener('click', function() {
+    clearEverything();
+});
+var clearEverything = function() {
+    for(var i=0; i<wavesArray.length; i++) {
+	wavesArray[i].wipe();
+    }
+    deleteResultant();
+    //lol idk if deleting an array like this is good practice
+    wavesArray = [];
+    refreshWaveDiv();
+    resetPlayButton();
+    resetTimeElapsed();
+    clearExportArea();
+};
+var clearExportArea = function() {
+    exportArea.innerHTML = '';    
+};
+
+var deleteResultant = function() {
+    resultantWave.removeSegments();
+    resultantPhasor.remove();
+};
+
+//Button #3. RESET button.
+var resetButton = document.getElementById('reset');
+resetButton.addEventListener('click', function() {
+    for(var i=0; i<wavesArray.length; i++) {
+	wavesArray[i].reset();
+    }
+    deleteResultant();
+    resetPlayButton();
+    resetTimeElapsed();
+    refreshResultant();
+    clearExportArea();
+});
+var resetPlayButton = function() {
+    //Modify the play/pause button manually.
+    if(play) {
+	play=!play;
+	if(playButton.innerHTML === 'Play') {
+	    playButton.innerHTML = 'Pause';
+	} else {
+	    playButton.innerHTML = 'Play';
+	}
+    }
+};
+
+var addWaveButton = document.getElementById('add_wave');
+addWaveButton.addEventListener('click', function() {
+    addWave();
+});
+
+//Button #5. addWave button.
+var addWave = function() {
+    if(wavesArray.length<5) {
+	var k = Math.PI*2/maxWavelength;
+	var omega = calculateOmegaFromK(k);
+	wavesArray.push(new Wave(DEFAULT_AMPL,
+				 DEFAULT_K,
+				 DEFAULT_OMEGA,
+				 DEFAULT_PHI,
+				 DEFAULT_COLOR,
+				 DEFAULT_DIR));
+	refreshWaveDiv();
+	if(showResultant) {
+	    refreshResultant();
+	}
+    }
+};
+
+var addCustomWave = function(a,k,w,p,color,dir) {
+    if(wavesArray.length<5) {
+	wavesArray.push(new Wave(a,k,w,p,color,dir));
+	refreshWaveDiv();
+	if(showResultant) {
+	    refreshResultant();
+	}
+    }
+};
+
+
+
+var speedSlider = document.getElementById('speed');
+var speed_val = document.getElementById('speed_val');
+speedSlider.addEventListener('input', function() {
+    var speedVal = speedSlider.value;
+    var scaled = parseFloat(speedVal).toFixed(3);
+    speed_val.innerHTML=''+scaled;
+    speedVal = parseFloat(speedVal);
+    //Scale the timeStep downwards.
+    timeStep=speedVal/1000;
+    //Modifying the timer on the screen.
+    if(play) {
+	clearInterval(setIntervalVariable);
+	if(speedVal!==0) {
+	    setIntervalVariable = setInterval(function() {
+		currentTime+=1;
+		time_elapsed.innerHTML=''+currentTime;
+	    }, 1000/speedVal);
+	    setIntervalInitialized=true;
+	}
+    }
+});
+
+var phasorTailsSelector = document.getElementById('phasor_tails');
+phasorTailsSelector.addEventListener('change', function() {
+    tails_at_origin=!tails_at_origin;
+    refreshWaves();
+});
+
+var wavesToShowSelector = document.getElementById('wave_option');
+wavesToShowSelector.addEventListener('change', function() {
+    if(wavesToShowSelector.value === 'show_all') {
+	showIndividual=true;
+	showResultant=true;
+    }
+    if(wavesToShowSelector.value === 'resultant_only') {
+	showIndividual=false;
+	showResultant=true;
+    }
+    if(wavesToShowSelector.value === 'individual_only') {
+	showIndividual=true;
+	deleteResultant();
+	showResultant=false;
+    }
+    refreshWaves();
+});
 
 
 
@@ -560,49 +603,11 @@ var writeExportArea = function() {
     
 };
 
-var addWaveButton = document.getElementById('add_wave');
-addWaveButton.addEventListener('click', function() {
-    addWave();
-});
-
-var addWave = function() {
-    if(wavesArray.length<5) {
-	var k = Math.PI*2/maxWavelength;
-	var omega = calculateOmegaFromK(k);
-	wavesArray.push(new Wave(DEFAULT_AMPL,
-				 DEFAULT_K,
-				 DEFAULT_OMEGA,
-				 DEFAULT_PHI,
-				 DEFAULT_COLOR,
-				 DEFAULT_DIR));
-	refreshWaveDiv();
-	if(showResultant) {
-	    refreshResultant();
-	}
-    }
-};
 
 
 
-var DEFAULT_AMPL = 1;
-var DEFAULT_K = Math.PI*2/maxWavelength;
-var DEFAULT_OMEGA = calculateOmegaFromK(DEFAULT_K);
-var DEFAULT_FREQUENCY = 1;
-var DEFAULT_PHI = 0;
-var DEFAULT_COLOR = 'blue';
-var DEFAULT_DIR = '-';
 
-
-var addCustomWave = function(a,k,w,p,color,dir) {
-    if(wavesArray.length<5) {
-	wavesArray.push(new Wave(a,k,w,p,color,dir));
-	refreshWaveDiv();
-	if(showResultant) {
-	    refreshResultant();
-	}
-    }
-};
-
+//Helpers to create the wave DOM.
 createColorDropdown = function(waveObj) {
     var select = document.createElement('select');
     var blue = document.createElement('option');
