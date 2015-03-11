@@ -103,8 +103,7 @@ function Wave(a,k,omega,phi,color,d) {
 
     this.arrayIndex=-1;
     this.amplitude = a;
-    this.lambda = maxWavelength / 1;
-    //this.k = 2*Math.PI / this.lambda;
+
     this.k = k;
     
     this.omega=omega;
@@ -112,6 +111,7 @@ function Wave(a,k,omega,phi,color,d) {
     this.phiTimeDelta=0;
     this.phi = phi;
     this.frequency=1;
+    //this.lambda = maxWavelength / this.frequency;
     this.color = color;
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -142,9 +142,9 @@ function Wave(a,k,omega,phi,color,d) {
     };
     
 
-    this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
+    this.edit=function(amplSliderVal, frequencySliderVal,phiSliderVal,pseudoOrigin) {
 	this.amplitude = amplSliderVal;
-	this.frequency = wavelengthSliderVal;
+	this.frequency = frequencySliderVal;
 	this.phi = phiSliderVal;
 	
 	this.path.removeSegments();
@@ -303,7 +303,7 @@ function Wave(a,k,omega,phi,color,d) {
 	frequency_slider.addEventListener('input', function() {
 	    waveObj.lambda = maxWavelength/frequency_slider.value;
 	    var k_tmp = 2*Math.PI/waveObj.lambda;
-	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(2);
+	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(3);
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
 	    waveObj.omega=omega_tmp; //I actually changed omega value here.
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
@@ -369,9 +369,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.refreshWaveDOM = function() {
 	this.amp_span.innerHTML = this.amplitude;
 	//this.k_span.innerHTML = this.k;
-	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(3);
+	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(2);
 	this.amp_slider.value = this.amplitude;
-	//this.f_slider.value = this.frequency;
 	var phi_scaled = this.phi / Math.PI;
 	this.phi_input.value = phi_scaled;
 	this.phi_slider.value = this.phi;
@@ -529,7 +528,7 @@ var speedSlider = document.getElementById('speed');
 var speed_val = document.getElementById('speed_val');
 speedSlider.addEventListener('input', function() {
     var speedVal = speedSlider.value;
-    var scaled = parseFloat(speedVal).toFixed(1);
+    var scaled = parseFloat(speedVal).toFixed(3);
     speed_val.innerHTML=''+scaled;
     speedVal = parseFloat(speedVal);
     //Scale the timeStep downwards.
@@ -729,12 +728,10 @@ var addWave = function() {
 	//in the ficticious world, which is what is to be expected,
 	//because the default is to have the wave only have
 	//one wavelength across the page.
-	var w = Math.PI*2*velocityOfMedium/maxWavelength;
-	console.log('w'+w);
-	console.log(velocityOfMedium);
-	console.log(maxWavelength);
-	console.log(w);
-	wavesArray.push(new Wave(1,k,w,0,'blue','-'));
+	//var omega = Math.PI*2*velocityOfMedium/maxWavelength;
+	var omega = velocityOfMedium * k;
+	console.log(k + ' ' + omega);
+	wavesArray.push(new Wave(1,k,omega,0,'blue','-'));
 	refreshWaveDiv();
 	if(showResultant) {
 	    refreshResultant();
