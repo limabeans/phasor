@@ -53,8 +53,6 @@ var incrementTimeElapsed = function(timeStep) {
 };
 
 
-
-
 var createTable = function() {
     var table = document.createElement('table');
     table.className = 'tables';
@@ -471,6 +469,7 @@ refreshWaves = function() {
 		wavesArray[i].phiTimeDelta += omega*timeStep;
 	    }
 	}
+
 	if(showIndividual) {
 	    wavesArray[i].setVisible();
 	} else {
