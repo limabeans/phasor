@@ -1,7 +1,5 @@
 //Global variables.
 var canvas = document.getElementById("waveCanvas");
-//canvas.width = window.innerWidth/1.03;
-//canvas.height = window.innerHeight/1.4;
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
 var pixelWavelength = (canvas.width - zeroX);
@@ -10,29 +8,41 @@ var maxAmpl = 2;
 var maxHeight = canvas.height/2;
 //wavelength = ratio of y_max/w_max
 var wavelength = pixelWavelength/maxHeight;
-
-//And so maxWavelength is now scaled by whatever 
-//maxAmpl is, which is currently set to 2.
-//So technically, in this ficticious scaled universe,
-//your wavelength can be never be no longer than 4.66.
-
 var maxWavelength = wavelength*maxAmpl;
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
-var DEFAULT_FREQUENCY = 1;
 var currentTime=0;
 var timeStep = 0.001;
-var play=false;
+
 var wavesArray=[];
-var tails_at_origin=true;
+
 var resultantWave = new Path({strokeColor:'black', strokeWidth:3});
 var resultantPhasor = new Group({strokeColor: 'black', strokeWidth:3});
+
+var play=false;
+var tails_at_origin=true;
 var showIndividual=true;
 var showResultant=true;
-
 var setIntervalInitialized=false;
 var setIntervalVariable = null;
+
+
+var calculateWavelength = function(frequency) {
+    return maxWavelength / frequency;
+};
+var calcluateKFromOmega = function(omega) {
+    return omega / velocityOfMedium;
+};
+var calculateOmegaFromK = function(k) {
+    return k * velocityOfMedium;
+};
+var calculateFrequencyFromOmega = function(omega) {
+    return omega/(2*Math.PI);
+};
+
+
+
 
 var time_elapsed = document.getElementById('time_elapsed');
 var resetTimeElapsed = function() {
@@ -52,7 +62,6 @@ var incrementTimeElapsed = function(timeStep) {
     }
 
 };
-
 
 var createTable = function() {
     var table = document.createElement('table');
@@ -106,15 +115,13 @@ function Wave(a,k,omega,phi,color,d) {
     //Using arrayIndex to support deletion of waves.
     this.arrayIndex=-1;
 
-
-    //this.lambda = maxWavelength / this.frequency;
-
     //Wave's instance variables.
     this.amplitude = a;
-    this.frequency=DEFAULT_FREQUENCY; //1
+    //this.frequency=DEFAULT_FREQUENCY; //1
     this.k = k;
     this.omega=omega;
     this.phi = phi;
+    this.frequency = calculateFrequencyFromOmega(this.omega);
 
     //Other fields related to displaying.
     //TimeDelta used for moving the wave on the screen.
@@ -310,7 +317,7 @@ function Wave(a,k,omega,phi,color,d) {
 	frequency_slider.min='.5';
 	frequency_slider.max='10';
 	frequency_slider.step='.1';
-	frequency_slider.value='1';
+	frequency_slider.value=''+waveObj.frequency;
 
 	frequency_slider.addEventListener('input', function() {
 	    var lambda = calculateWavelength(frequency_slider.value);
@@ -345,6 +352,25 @@ function Wave(a,k,omega,phi,color,d) {
 	    waveObj.phi_input.value=''+scaleByPi;
 	    waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
+
+
+	var space = document.createElement('span');
+	space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+	sliders.appendChild(space);
+
+	var deleteButton = document.createElement('button');
+	deleteButton.innerHTML='X';
+	deleteButton.addEventListener('click', function() {
+	    waveObj.wipe();
+	    wavesArray.splice(waveObj.arrayIndex,1);
+	    refreshWaveDiv();
+	    refreshResultant();
+	    clearExportArea();
+	});
+	
+	sliders.appendChild(deleteButton);
+
+
 	return sliders;
     };
 
@@ -357,22 +383,11 @@ function Wave(a,k,omega,phi,color,d) {
 	var eqn = this.createWaveEqn(this);
 	var newline = document.createElement('span');
 
-	var deleteButton = document.createElement('button');
-	deleteButton.innerHTML='X';
-	deleteButton.addEventListener('click', function() {
-	    waveObj.wipe();
-	    wavesArray.splice(waveObj.arrayIndex,1);
-	    refreshWaveDiv();
-	    refreshResultant();
-	    clearExportArea();
-	});
 
 	newline.innerHTML='<br>';
 	var sliders = this.createWaveSlidersDOM(this);
 	wave.appendChild(colorDropdown);
 	wave.appendChild(eqn);
-
-	wave.appendChild(deleteButton);
 
 	wave.appendChild(newline);
 	wave.appendChild(sliders);
@@ -732,19 +747,14 @@ addWaveButton.addEventListener('click', function() {
 
 var addWave = function() {
     if(wavesArray.length<5) {
-	//var k = Math.PI*2/1;
 	var k = Math.PI*2/maxWavelength;
-	//"Drifting" bug fixed here. 
-	//Divide by maxWavelength rather than by 1.
-	//here, w is definitely omega.
-	//maxWavelength is definitely the largest wavelength
-	//in the ficticious world, which is what is to be expected,
-	//because the default is to have the wave only have
-	//one wavelength across the page.
-	//var omega = Math.PI*2*velocityOfMedium/maxWavelength;
-	var omega = velocityOfMedium * k;
-	console.log(k + ' ' + omega);
-	wavesArray.push(new Wave(1,k,omega,0,'blue','-'));
+	var omega = calculateOmegaFromK(k);
+	wavesArray.push(new Wave(DEFAULT_AMPL,
+				 DEFAULT_K,
+				 DEFAULT_OMEGA,
+				 DEFAULT_PHI,
+				 DEFAULT_COLOR,
+				 DEFAULT_DIR));
 	refreshWaveDiv();
 	if(showResultant) {
 	    refreshResultant();
@@ -753,18 +763,15 @@ var addWave = function() {
 };
 
 
-var calculateWavelength = function(frequency) {
-    return maxWavelength / frequency;
-};
 
-var calcluateKFromOmega = function(omega) {
-    return omega / velocityOfMedium;
-};
+var DEFAULT_AMPL = 1;
+var DEFAULT_K = Math.PI*2/maxWavelength;
+var DEFAULT_OMEGA = calculateOmegaFromK(DEFAULT_K);
+var DEFAULT_FREQUENCY = 1;
+var DEFAULT_PHI = 0;
+var DEFAULT_COLOR = 'blue';
+var DEFAULT_DIR = '-';
 
-
-var calculateOmegaFromK = function(k) {
-    return k * velocityOfMedium;
-};
 
 var addCustomWave = function(a,k,w,p,color,dir) {
     if(wavesArray.length<5) {
@@ -804,3 +811,5 @@ createColorDropdown = function(waveObj) {
     });
     return select;
 };
+
+
