@@ -203,34 +203,6 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
 
-    this.createColorDropdown = function(waveObj) {
-	var select = document.createElement('select');
-	var blue = document.createElement('option');
-	blue.text='Blue';
-	blue.value='blue';
-	var green = document.createElement('option');
-	green.text='Green';
-	green.value='green';
-	var red = document.createElement('option');
-	red.text='Red';
-	red.value='red';
-	var orange = document.createElement('option');
-	orange.text='Orange';
-	orange.value='orange';
-	var purple = document.createElement('option');
-	purple.text='Purple';
-	purple.value='purple';
-	select.add(blue);
-	select.add(green);
-	select.add(red);
-	select.add(orange);
-	select.add(purple);
-	select.addEventListener('change', function() {
-	    waveObj.color=select.value;
-	    waveObj.refresh();
-	});
-	return select;
-    };
 
     this.createWaveEqn = function(waveObj) {
 	var eqn = document.createElement('span');
@@ -370,7 +342,7 @@ function Wave(a,k,omega,phi,color,d) {
 	var wave = document.createElement('div');
 	
 
-	var colorDropdown = this.createColorDropdown(this);
+	var colorDropdown = createColorDropdown(this);
 	var eqn = this.createWaveEqn(this);
 	var newline = document.createElement('span');
 
@@ -486,28 +458,32 @@ function onFrame(event) {
 };
 
 refreshWaves = function() {
-
+    console.log('refresh');
     //This iterates through the wavesArray and dynamically updates/redraws 
     //all of the waves onto the screen.
     for(var i = 0; i <wavesArray.length; i++) {
+	console.log('before anything happens'+wavesArray[i].toString());
 	var omega = parseFloat(wavesArray[i].omega);
 	if(wavesArray[i].dir==='-') {
 	    wavesArray[i].phiTimeDelta -= omega*timeStep;
 	} else {
 	    wavesArray[i].phiTimeDelta += omega*timeStep;
 	}
+	console.log('plus some stuff'+wavesArray[i].toString());
 	if(showIndividual) {
 	    wavesArray[i].setVisible();
 	} else {
 	    wavesArray[i].setInvisible();
 	}
+	console.log('3hasd'+wavesArray[i].toString());
 	//This is the part where we actually draw to the screen.
 	//How we edit the waves depends on whether we want the phasors to be 
 	//all tails at origin, or vector added.
 	//We won't see anything on the screen, however, if the individual waves were set to invisible.
 	if(tails_at_origin) {
-	    wavesArray[i].edit(wavesArray[i].a,
-			       wavesArray[i].w,wavesArray[i].phi,phasorOriginPoint);
+	    wavesArray[i].edit(wavesArray[i].amplitude,
+			       wavesArray[i].frequency,wavesArray[i].phi,phasorOriginPoint);
+	    console.log('4kZJ'+wavesArray[i].toString());
 	} else {
 	    if(i==0) {
 		//The first phasor should really be at the origin.
@@ -777,3 +753,31 @@ var addCustomWave = function(a,k,w,p,color,dir) {
     }
 };
 
+createColorDropdown = function(waveObj) {
+    var select = document.createElement('select');
+    var blue = document.createElement('option');
+    blue.text='Blue';
+    blue.value='blue';
+    var green = document.createElement('option');
+    green.text='Green';
+    green.value='green';
+    var red = document.createElement('option');
+    red.text='Red';
+    red.value='red';
+    var orange = document.createElement('option');
+    orange.text='Orange';
+    orange.value='orange';
+    var purple = document.createElement('option');
+    purple.text='Purple';
+    purple.value='purple';
+    select.add(blue);
+    select.add(green);
+    select.add(red);
+    select.add(orange);
+    select.add(purple);
+    select.addEventListener('change', function() {
+	waveObj.color=select.value;
+	waveObj.refresh();
+    });
+    return select;
+};
