@@ -311,15 +311,17 @@ function Wave(a,k,omega,phi,color,d) {
 	frequency_slider.max='10';
 	frequency_slider.step='.1';
 	frequency_slider.value='1';
+
 	frequency_slider.addEventListener('input', function() {
-	    waveObj.lambda = maxWavelength/frequency_slider.value;
-	    var k_tmp = 2*Math.PI/waveObj.lambda;
-	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(3);
-	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
-	    waveObj.omega=omega_tmp; //I actually changed omega value here.
-	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
+	    var lambda = calculateWavelength(frequency_slider.value);
+	    var k = 2*Math.PI/lambda;
+	    waveObj.k_span.innerHTML = parseFloat(k).toFixed(3);
+	    var omega = calculateOmegaFromK(k);
+	    waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
 	    waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
 	});
+
+
 	sliders.appendChild(frequency_slider);
 	waveObj.f_slider = frequency_slider;
 
@@ -753,6 +755,15 @@ var addWave = function() {
 
 var calculateWavelength = function(frequency) {
     return maxWavelength / frequency;
+};
+
+var calcluateKFromOmega = function(omega) {
+    return omega / velocityOfMedium;
+};
+
+
+var calculateOmegaFromK = function(k) {
+    return k * velocityOfMedium;
 };
 
 var addCustomWave = function(a,k,w,p,color,dir) {
