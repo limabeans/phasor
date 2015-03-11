@@ -6,10 +6,17 @@ var zeroX = canvas.height;
 var zeroY = canvas.height/2;
 var pixelWavelength = (canvas.width - zeroX);
 var maxAmpl = 2;
+//maxHeight is in pixels as well.
 var maxHeight = canvas.height/2;
 //wavelength = ratio of y_max/w_max
 var wavelength = pixelWavelength/maxHeight;
+
+//And so maxWavelength is now scaled by whatever 
+//maxAmpl is, which is currently set to 2.
+//So technically, in this ficticious scaled universe,
+//your wavelength can be never be no longer than 4.66.
 var maxWavelength = wavelength*maxAmpl;
+console.log(maxWavelength);
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
@@ -97,16 +104,16 @@ function Wave(a,k,omega,phi,color,d) {
     this.phi_slider = null;
 
     this.arrayIndex=-1;
-    this.a = a;
+    this.amplitude = a;
     this.lambda = maxWavelength / 1;
     //this.k = 2*Math.PI / this.lambda;
-    //this.k = k;
+    this.k = k;
     
     this.omega=omega;
 
     this.phiTimeDelta=0;
     this.phi = phi;
-    this.w=1;
+    this.frequency=1;
     this.color = color;
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -133,13 +140,13 @@ function Wave(a,k,omega,phi,color,d) {
     
     this.reset=function() {
 	this.phiTimeDelta=0;
-	this.edit(this.a,this.w,this.phi,phasorOriginPoint);
+	this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
     };
     
 
     this.edit=function(amplSliderVal, wavelengthSliderVal,phiSliderVal,pseudoOrigin) {
-	this.a = amplSliderVal;
-	this.w = wavelengthSliderVal;
+	this.amplitude = amplSliderVal;
+	this.frequency = wavelengthSliderVal;
 	this.phi = phiSliderVal;
 	
 	this.path.removeSegments();
@@ -149,9 +156,9 @@ function Wave(a,k,omega,phi,color,d) {
 	    //Scaling on the fraction to find out "where I am" on the
 	    // wavelength, and then finding out where I am on the 2pi
 	    //unit circle.
-	    var sinInput = this.w*scaleFraction*(2*Math.PI);
+	    var sinInput = this.frequency*scaleFraction*(2*Math.PI);
 	    var scaledHeight = maxHeight/maxAmpl;
-	    var deltaY=this.a*scaledHeight*Math.sin(sinInput+this.phi+this.phiTimeDelta);
+	    var deltaY=this.amplitude*scaledHeight*Math.sin(sinInput+this.phi+this.phiTimeDelta);
 	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 
 	}
@@ -171,9 +178,9 @@ function Wave(a,k,omega,phi,color,d) {
 	this.phasor.remove();
 	var line = new Path();
 	var scaledHeight = maxHeight/maxAmpl;
-	var deltaX=scaledHeight*this.a*Math.cos(this.phi+this.phiTimeDelta);
+	var deltaX=scaledHeight*this.amplitude*Math.cos(this.phi+this.phiTimeDelta);
 	this.dX=deltaX;
-	var deltaY=scaledHeight*this.a*Math.sin(this.phi+this.phiTimeDelta);
+	var deltaY=scaledHeight*this.amplitude*Math.sin(this.phi+this.phiTimeDelta);
 	this.dY=deltaY;
 	var offset = new Point(origin.x+deltaX,
 			       origin.y-deltaY);
@@ -192,7 +199,7 @@ function Wave(a,k,omega,phi,color,d) {
     	this.path = new Path({strokeColor: this.color, strokeWidth:1});
 	this.phasor.remove();
     	this.phasor=new Group();
-    	this.edit(this.a, this.w, this.phi,phasorOriginPoint);
+    	this.edit(this.amplitude, this.frequency, this.phi,phasorOriginPoint);
     };
 
 
@@ -226,7 +233,6 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
     this.createWaveEqn = function(waveObj) {
-	//[color] y(x,t)=[1.00]sin([6.28]x [-+] [62.83]t + [0])
 	var eqn = document.createElement('span');
 	//y(x,t) =
 	var y_x_t = document.createTextNode('y(x,t) = ');
@@ -242,7 +248,8 @@ function Wave(a,k,omega,phi,color,d) {
 	eqn.appendChild(sin_txt);
 	//[6.28]
 	var k_span = document.createElement('span');
-	k_span.innerHTML='6.28';
+	//k_span.innerHTML='6.28';
+	k_span.innerHTML=parseFloat(waveObj.k).toFixed(3);
 	waveObj.k_span = k_span;
 	eqn.appendChild(k_span);
 	//x
@@ -281,7 +288,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    if(event.keyCode == 13) {
 		var floatVal = eval(phiInput.value)*Math.PI;
 		waveObj.phi_slider.value=''+floatVal;
-		waveObj.edit(waveObj.a,waveObj.w, floatVal, phasorOriginPoint);
+		waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
 	    }
 	});
 
@@ -305,7 +312,7 @@ function Wave(a,k,omega,phi,color,d) {
 	a_slider.max='2';
 	a_slider.step='0.01';
 	a_slider.addEventListener('input', function() {
-	    waveObj.a=a_slider.value;
+	    waveObj.amplitude=a_slider.value;
 	    waveObj.a_span.innerHTML=''+a_slider.value;
 	    waveObj.refresh();
 	});
@@ -316,24 +323,24 @@ function Wave(a,k,omega,phi,color,d) {
 	num_wavelengths.innerHTML = 'f';
 	sliders.appendChild(num_wavelengths);
 
-	var num_wavelengths_slider = document.createElement('input');
-	num_wavelengths_slider.type='range';
-	num_wavelengths_slider.className='sliders';
-	num_wavelengths_slider.min='.5';
-	num_wavelengths_slider.max='10';
-	num_wavelengths_slider.step='.1';
-	num_wavelengths_slider.value='1';
-	num_wavelengths_slider.addEventListener('input', function() {
-	    waveObj.lambda = maxWavelength/num_wavelengths_slider.value;
+	var frequency_slider = document.createElement('input');
+	frequency_slider.type='range';
+	frequency_slider.className='sliders';
+	frequency_slider.min='.5';
+	frequency_slider.max='10';
+	frequency_slider.step='.1';
+	frequency_slider.value='1';
+	frequency_slider.addEventListener('input', function() {
+	    waveObj.lambda = maxWavelength/frequency_slider.value;
 	    var k_tmp = 2*Math.PI/waveObj.lambda;
 	    waveObj.k_span.innerHTML=''+parseFloat(k_tmp).toFixed(2);
 	    var omega_tmp = 2*Math.PI*velocityOfMedium/waveObj.lambda;
 	    waveObj.omega=omega_tmp; //I actually changed omega value here.
 	    waveObj.omega_span.innerHTML=''+parseFloat(omega_tmp).toFixed(2);
-	    waveObj.edit(waveObj.a, num_wavelengths_slider.value, waveObj.phi,phasorOriginPoint);
+	    waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
 	});
-	sliders.appendChild(num_wavelengths_slider);
-	waveObj.f_slider = num_wavelengths_slider;
+	sliders.appendChild(frequency_slider);
+	waveObj.f_slider = frequency_slider;
 
 	var phi = document.createElement('span');
 	phi.innerHTML='&phi;';
@@ -353,7 +360,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
 	    scaleByPi = parseFloat(scaleByPi).toFixed(3);
 	    waveObj.phi_input.value=''+scaleByPi;
-	    waveObj.edit(waveObj.a,waveObj.w, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
+	    waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
 	});
 	return sliders;
     };
@@ -374,6 +381,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    wavesArray.splice(waveObj.arrayIndex,1);
 	    refreshWaveDiv();
 	    refreshResultant();
+	    clearExportArea();
 	});
 
 	newline.innerHTML='<br>';
@@ -389,11 +397,11 @@ function Wave(a,k,omega,phi,color,d) {
     };
     
     this.refreshWaveDOM = function() {
-	this.amp_span.innerHTML = this.a;
+	this.amp_span.innerHTML = this.amplitude;
 	//this.k_span.innerHTML = this.k;
 	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(3);
-	this.amp_slider.value = this.a;
-	//this.f_slider.value = this.w;
+	this.amp_slider.value = this.amplitude;
+	//this.f_slider.value = this.frequency;
 	var phi_scaled = this.phi / Math.PI;
 	this.phi_input.value = phi_scaled;
 	this.phi_slider.value = this.phi;
@@ -402,11 +410,11 @@ function Wave(a,k,omega,phi,color,d) {
 
 
     //Draw initial wave.
-    this.edit(this.a,this.w,this.phi,phasorOriginPoint);
+    this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
     this.waveDOM = this.createWaveDOM(this);
     
     this.toString = function() {
-	var str = ''+this.a+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
+	var str = ''+this.amplitude+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
 	return str;
     };
 
@@ -584,9 +592,13 @@ var clearEverything = function() {
     refreshWaveDiv();
     resetPlayButton();
     resetTimeElapsed();
-    exportArea.innerHTML = '';
+    clearExportArea();
 };
 
+
+var clearExportArea = function() {
+    exportArea.innerHTML = '';    
+};
 clearButton.addEventListener('click', function() {
     clearEverything();
 });
@@ -605,6 +617,7 @@ resetButton.addEventListener('click', function() {
     resetPlayButton();
     resetTimeElapsed();
     refreshResultant();
+    clearExportArea();
 });
 
 var resetPlayButton = function() {
@@ -709,6 +722,10 @@ importButton.addEventListener('change', function(e) {
 var exportButton = document.getElementById('export_waves');
 var exportArea = document.getElementById('exportArea');
 exportButton.addEventListener('click', function() {
+    writeExportArea();
+});
+
+var writeExportArea = function() {
     if(wavesArray.length>0) {
 	var text = '';
 	for(var i = 0; i < wavesArray.length; i++) {
@@ -719,7 +736,7 @@ exportButton.addEventListener('click', function() {
 	exportArea.innerHTML = 'No waves to export . . .';
     }
     
-});
+};
 
 var addWaveButton = document.getElementById('add_wave');
 addWaveButton.addEventListener('click', function() {
@@ -728,10 +745,20 @@ addWaveButton.addEventListener('click', function() {
 
 var addWave = function() {
     if(wavesArray.length<5) {
-	var k = Math.PI*2/1;
+	//var k = Math.PI*2/1;
+	var k = Math.PI*2/maxWavelength;
 	//"Drifting" bug fixed here. 
 	//Divide by maxWavelength rather than by 1.
+	//here, w is definitely omega.
+	//maxWavelength is definitely the largest wavelength
+	//in the ficticious world, which is what is to be expected,
+	//because the default is to have the wave only have
+	//one wavelength across the page.
 	var w = Math.PI*2*velocityOfMedium/maxWavelength;
+	console.log('w'+w);
+	console.log(velocityOfMedium);
+	console.log(maxWavelength);
+	console.log(w);
 	wavesArray.push(new Wave(1,k,w,0,'blue','-'));
 	refreshWaveDiv();
 	if(showResultant) {
