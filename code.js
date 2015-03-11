@@ -15,11 +15,12 @@ var wavelength = pixelWavelength/maxHeight;
 //maxAmpl is, which is currently set to 2.
 //So technically, in this ficticious scaled universe,
 //your wavelength can be never be no longer than 4.66.
+
 var maxWavelength = wavelength*maxAmpl;
-console.log(maxWavelength);
 var pointsPerWave = 100;
 var phasorOriginPoint = new Point(zeroX/2,zeroY);
 var velocityOfMedium = 10;
+var DEFAULT_FREQUENCY = 1;
 var currentTime=0;
 var timeStep = 0.001;
 var play=false;
@@ -90,28 +91,34 @@ var refreshWaveDiv = function() {
 };
 
 function Wave(a,k,omega,phi,color,d) {
+    //DOM element reference variables.
+    //Need these to support import/export.
     this.color_dropdown = null;
     this.amp_span = null;
     this.k_span = null;
     this.dir_dropdown = null;
     this.omega_span = null;
     this.phi_input = null;
-
     this.amp_slider = null;
     this.f_slider = null;
     this.phi_slider = null;
 
+    //Using arrayIndex to support deletion of waves.
     this.arrayIndex=-1;
-    this.amplitude = a;
 
-    this.k = k;
-    
-    this.omega=omega;
 
-    this.phiTimeDelta=0;
-    this.phi = phi;
-    this.frequency=1;
     //this.lambda = maxWavelength / this.frequency;
+
+    //Wave's instance variables.
+    this.amplitude = a;
+    this.frequency=DEFAULT_FREQUENCY; //1
+    this.k = k;
+    this.omega=omega;
+    this.phi = phi;
+
+    //Other fields related to displaying.
+    //TimeDelta used for moving the wave on the screen.
+    this.phiTimeDelta=0;
     this.color = color;
     this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -143,9 +150,13 @@ function Wave(a,k,omega,phi,color,d) {
     
 
     this.edit=function(amplSliderVal, frequencySliderVal,phiSliderVal,pseudoOrigin) {
+
+	//Update all instance variables.
 	this.amplitude = amplSliderVal;
 	this.frequency = frequencySliderVal;
 	this.phi = phiSliderVal;
+	this.k = 2*Math.PI / calculateWavelength(this.frequency);
+	this.omega = velocityOfMedium * this.k;
 	
 	this.path.removeSegments();
 	for(var i = 0; i <= pointsPerWave; i++) {
@@ -737,6 +748,11 @@ var addWave = function() {
 	    refreshResultant();
 	}
     }
+};
+
+
+var calculateWavelength = function(frequency) {
+    return maxWavelength / frequency;
 };
 
 var addCustomWave = function(a,k,w,p,color,dir) {
