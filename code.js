@@ -655,34 +655,36 @@ wavesToShowSelector.addEventListener('change', function() {
 
 var refreshResultant = function() {
     //resultantWave
-    resultantWave.removeSegments();
-    if(wavesArray.length>0) {
-	for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
-	    var resultantWave_x=0;
-	    var resultantWave_y=0;
-	    for(var s = 0; s < wavesArray.length; s++) {
-		resultantWave_x=wavesArray[0].path.segments[i].point.x;
-		resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+    if(showResultant) {
+	resultantWave.removeSegments();
+	if(wavesArray.length>0) {
+	    for(var i = 0; i < wavesArray[0].path.segments.length; i++) {
+		var resultantWave_x=0;
+		var resultantWave_y=0;
+		for(var s = 0; s < wavesArray.length; s++) {
+		    resultantWave_x=wavesArray[0].path.segments[i].point.x;
+		    resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
+		}
+		resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
+		resultantWave.smooth();
 	    }
-	    resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
-	    resultantWave.smooth();
 	}
-    }
 
-    //resultantPhasor
-    resultantPhasor.remove();
-    var line = new Path();
-    line.add(phasorOriginPoint);
-    var resultant_dX=0;
-    var resultant_dY=0;
-    for(var i=0; i < wavesArray.length; i++) {
-	resultant_dX+=wavesArray[i].dX;
-	resultant_dY-=wavesArray[i].dY;
+	//resultantPhasor
+	resultantPhasor.remove();
+	var line = new Path();
+	line.add(phasorOriginPoint);
+	var resultant_dX=0;
+	var resultant_dY=0;
+	for(var i=0; i < wavesArray.length; i++) {
+	    resultant_dX+=wavesArray[i].dX;
+	    resultant_dY-=wavesArray[i].dY;
+	}
+	var resultant_offset = new Point(resultant_dX, resultant_dY);
+	var resultant_dot = phasorOriginPoint+resultant_offset;
+	line.add(resultant_dot);
+	resultantPhasor = drawArrow(line, resultant_dot,phasorOriginPoint,'black',3);
     }
-    var resultant_offset = new Point(resultant_dX, resultant_dY);
-    var resultant_dot = phasorOriginPoint+resultant_offset;
-    line.add(resultant_dot);
-    resultantPhasor = drawArrow(line, resultant_dot,phasorOriginPoint,'black',3);
 };
 
 
