@@ -69,6 +69,7 @@ var midwayLine = new Path.Line({
 });
 
 //Calculate helpers.
+//Be wary of helpers with 'maxWavelength'
 var calcluateKFromOmega = function(omega) {
     return omega / velocityOfMedium;
 };
@@ -84,11 +85,8 @@ var calculateFrequencyFromOmega = function(omega) {
 
 var DEFAULT_AMPL = 1;
 var DEFAULT_K = Math.PI*2/maxWavelength;
-console.log('DEFAULT_K'+DEFAULT_K);
 var DEFAULT_OMEGA = calculateOmegaFromK(DEFAULT_K);
-console.log('DEFAULT_OMEGA'+DEFAULT_OMEGA);
 var DEFAULT_FREQUENCY = calculateFrequencyFromOmega(DEFAULT_OMEGA);
-console.log('DEFALT_FREQ'+DEFAULT_FREQUENCY);
 var DEFAULT_PHI = 0;
 var DEFAULT_COLOR = 'blue';
 var DEFAULT_DIR = '-';
@@ -141,7 +139,9 @@ var refreshWaveDiv = function() {
 	var tr = document.createElement('tr');
 	var td = document.createElement('td');
 	tr.appendChild(td);
+	//Refresh the wave DOM.
 	wavesArray[i].refreshWaveDOM();
+
 	td.appendChild(wavesArray[i].waveDOM);
 	tbody.appendChild(tr);
 	//Regenerating the array index of every wave.
@@ -167,19 +167,16 @@ function Wave(a,k,omega,phi,color,d) {
     //Wave's instance variables.
     this.amplitude = a;
     this.k = k;
-    console.log('this.k='+this.k);
     this.omega=omega;
-    console.log('omega'+this.omega);
     this.phi = phi;
     this.frequency = calculateFrequencyFromOmega(this.omega);
-    console.log('FREQUENCY'+this.frequency);
+    this.dir=d;
 
     //Other fields related to displaying.
     //TimeDelta used for moving the wave on the screen.
     this.phiTimeDelta=0;
     this.arrayIndex=-1;
     this.color = color;
-    this.dir=d;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
     this.phasor = new Group();
     this.offsetPoint=null;
@@ -211,15 +208,9 @@ function Wave(a,k,omega,phi,color,d) {
 
 	//Update all instance variables.
 	this.amplitude = amplSliderVal;
-	console.log('frequency before'+this.frequency);
 	this.frequency = frequencySliderVal;
-	console.log('frequency after'+this.frequency);
 	this.phi = phiSliderVal;
-	console.log('kbefore'+this.k);
 	this.k = calculateKFromFrequency(this.frequency);
-	console.log('kafter'+this.k);
-	console.log('the freqicy'+this.frequency);
-	console.log('get fucked'+this.k);
 	this.omega = calculateOmegaFromK(this.k);
 
 	this.path.removeSegments();
@@ -280,12 +271,15 @@ function Wave(a,k,omega,phi,color,d) {
 
     //Need to implement this for import/export feature.
     this.refreshWaveDOM = function() {
+	this.color_dropdown.value = this.color;
 	this.amp_span.innerHTML = this.amplitude;
-	//this.k_span.innerHTML = this.k;
+	this.k_span.innerHTML = parseFloat(this.k).toFixed(3);
 	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(2);
-	this.amp_slider.value = this.amplitude;
+	this.dir_dropdown.value = this.dir;
 	var phi_scaled = this.phi / Math.PI;
 	this.phi_input.value = phi_scaled;
+
+	this.amp_slider.value = this.amplitude;
 	this.phi_slider.value = this.phi;
     };
 
@@ -300,8 +294,6 @@ function Wave(a,k,omega,phi,color,d) {
     //Draw initial wave.
     this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
     this.waveDOM = createWaveDOM(this);
-    console.log(this.toString()+','+this.frequency);
-    
 };
 
 //The loop.
@@ -504,15 +496,10 @@ var addWave = function() {
     }
 };
 
-var addCustomWave = function(a,k,w,p,color,dir) {
+var addCustomWave = function(ampl,k,omega,phi,color,dir) {
     if(wavesArray.length<5) {
-	console.log(a);
-	console.log(k);
-	console.log(w);
-	console.log(p);
 
-	wavesArray.push(new Wave(a,k,w,p,color,dir));
-	console.log(wavesArray[wavesArray.length-1].toString());
+	wavesArray.push(new Wave(ampl,k,omega,phi,color,dir));
 	refreshWaveDiv();
 	if(showResultant) {
 	    refreshResultant();
@@ -581,26 +568,23 @@ importButton.addEventListener('change', function(e) {
 	clearEverything();
 	var contents = e.target.result;
 	var arr = contents.split("\n");
-	console.log(arr);
 	for(var i = 0; i < arr.length; i++) {
 	    var waveParts = arr[i].split(",");
-	    var a = parseFloat(waveParts[0]);
+	    var ampl = parseFloat(waveParts[0]);
 	    var k = parseFloat(waveParts[1]);
-	    var w = parseFloat(waveParts[2]);
-	    var p = parseFloat(waveParts[3]);
+	    var omega = parseFloat(waveParts[2]);
+	    var phi = parseFloat(waveParts[3]);
 	    var color = waveParts[4];
 	    var dir = waveParts[5];
-	    if(!isNaN(a) && !isNaN(k) && !isNaN(w) &&
-	       !isNaN(p)) {
-		addCustomWave(a,k,w,p,color,dir);
+	    if(!isNaN(ampl) && !isNaN(k) && !isNaN(omega) &&
+	       !isNaN(phi)) {
+		addCustomWave(ampl,k,omega,phi,color,dir);
 		refreshWaveDiv();
 		refreshResultant();
 	    }
 	}
     };
-    
     reader.readAsText(file);
-    
 });
 
 var exportButton = document.getElementById('export_waves');
@@ -631,19 +615,19 @@ createColorDropdown = function(waveObj) {
     var select = document.createElement('select');
     var blue = document.createElement('option');
     blue.text='Blue';
-    blue.value='blue';
+    blue.value='Blue';
     var green = document.createElement('option');
     green.text='Green';
-    green.value='green';
+    green.value='Green';
     var red = document.createElement('option');
     red.text='Red';
-    red.value='red';
+    red.value='Red';
     var orange = document.createElement('option');
     orange.text='Orange';
-    orange.value='orange';
+    orange.value='Orange';
     var purple = document.createElement('option');
     purple.text='Purple';
-    purple.value='purple';
+    purple.value='Purple';
     select.add(blue);
     select.add(green);
     select.add(red);
@@ -685,6 +669,7 @@ createWaveEqn = function(waveObj) {
     var minus = document.createElement('option');
     minus.text='-'; minus.value='-';
     dir_dropdown.add(minus);
+    waveObj.dir_dropdown = dir_dropdown;
     var plus = document.createElement('option');
     plus.text='+'; plus.value='+';
     dir_dropdown.add(plus);
@@ -819,5 +804,7 @@ createWaveDOM = function(waveObj) {
     wave.appendChild(eqn);
     wave.appendChild(newline);
     wave.appendChild(sliders);
+    //Hand the waveObj the necessary reference for color.
+    waveObj.color_dropdown = colorDropdown;
     return wave;
 };
