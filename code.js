@@ -69,14 +69,11 @@ var midwayLine = new Path.Line({
 });
 
 //Calculate helpers.
-var calculateWavelength = function(frequency) {
-    return maxWavelength / frequency;
-};
 var calcluateKFromOmega = function(omega) {
     return omega / velocityOfMedium;
 };
 var calculateKFromFrequency = function(frequency) {
-    return 2*Math.PI / calculateWavelength(frequency);
+    return 2*Math.PI*frequency / velocityOfMedium;
 };
 var calculateOmegaFromK = function(k) {
     return k * velocityOfMedium;
@@ -87,8 +84,11 @@ var calculateFrequencyFromOmega = function(omega) {
 
 var DEFAULT_AMPL = 1;
 var DEFAULT_K = Math.PI*2/maxWavelength;
+console.log('DEFAULT_K'+DEFAULT_K);
 var DEFAULT_OMEGA = calculateOmegaFromK(DEFAULT_K);
-var DEFAULT_FREQUENCY = 1;
+console.log('DEFAULT_OMEGA'+DEFAULT_OMEGA);
+var DEFAULT_FREQUENCY = calculateFrequencyFromOmega(DEFAULT_OMEGA);
+console.log('DEFALT_FREQ'+DEFAULT_FREQUENCY);
 var DEFAULT_PHI = 0;
 var DEFAULT_COLOR = 'blue';
 var DEFAULT_DIR = '-';
@@ -167,9 +167,12 @@ function Wave(a,k,omega,phi,color,d) {
     //Wave's instance variables.
     this.amplitude = a;
     this.k = k;
+    console.log('this.k='+this.k);
     this.omega=omega;
+    console.log('omega'+this.omega);
     this.phi = phi;
     this.frequency = calculateFrequencyFromOmega(this.omega);
+    console.log('FREQUENCY'+this.frequency);
 
     //Other fields related to displaying.
     //TimeDelta used for moving the wave on the screen.
@@ -208,9 +211,15 @@ function Wave(a,k,omega,phi,color,d) {
 
 	//Update all instance variables.
 	this.amplitude = amplSliderVal;
+	console.log('frequency before'+this.frequency);
 	this.frequency = frequencySliderVal;
+	console.log('frequency after'+this.frequency);
 	this.phi = phiSliderVal;
+	console.log('kbefore'+this.k);
 	this.k = calculateKFromFrequency(this.frequency);
+	console.log('kafter'+this.k);
+	console.log('the freqicy'+this.frequency);
+	console.log('get fucked'+this.k);
 	this.omega = calculateOmegaFromK(this.k);
 
 	this.path.removeSegments();
@@ -281,7 +290,9 @@ function Wave(a,k,omega,phi,color,d) {
     };
 
     this.toString = function() {
-	var str = ''+this.amplitude+','+this.k_span.innerHTML+','+this.omega+','+this.phi+','+this.color+','+this.dir;
+	var str = ''+this.amplitude+','+
+	    this.k+','+this.omega+','+this.phi+','+
+	    this.color+','+this.dir;
 	return str;
     };
 
@@ -289,6 +300,7 @@ function Wave(a,k,omega,phi,color,d) {
     //Draw initial wave.
     this.edit(this.amplitude,this.frequency,this.phi,phasorOriginPoint);
     this.waveDOM = createWaveDOM(this);
+    console.log(this.toString()+','+this.frequency);
     
 };
 
@@ -494,7 +506,13 @@ var addWave = function() {
 
 var addCustomWave = function(a,k,w,p,color,dir) {
     if(wavesArray.length<5) {
+	console.log(a);
+	console.log(k);
+	console.log(w);
+	console.log(p);
+
 	wavesArray.push(new Wave(a,k,w,p,color,dir));
+	console.log(wavesArray[wavesArray.length-1].toString());
 	refreshWaveDiv();
 	if(showResultant) {
 	    refreshResultant();
@@ -563,6 +581,7 @@ importButton.addEventListener('change', function(e) {
 	clearEverything();
 	var contents = e.target.result;
 	var arr = contents.split("\n");
+	console.log(arr);
 	for(var i = 0; i < arr.length; i++) {
 	    var waveParts = arr[i].split(",");
 	    var a = parseFloat(waveParts[0]);
@@ -738,8 +757,7 @@ createWaveSlidersDOM = function(waveObj) {
     frequency_slider.value=''+waveObj.frequency;
 
     frequency_slider.addEventListener('input', function() {
-	var lambda = calculateWavelength(frequency_slider.value);
-	var k = 2*Math.PI/lambda;
+	var k = calculateKFromFrequency(frequency_slider.value);
 	waveObj.k_span.innerHTML = parseFloat(k).toFixed(3);
 	var omega = calculateOmegaFromK(k);
 	waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
