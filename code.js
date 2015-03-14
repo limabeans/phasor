@@ -231,6 +231,7 @@ function Wave(a,k,omega,phi,color,d) {
 	    this.path.add(new Point(zeroX+deltaX,zeroY-deltaY));
 
 	}
+	this.path.smooth();
 	this.editPhasor(pseudoOrigin);
 
 	//Redraw the resultant wave.
@@ -377,6 +378,7 @@ var refreshResultant = function() {
 		    resultantWave_y = resultantWave_y + (zeroY - wavesArray[s].path.segments[i].point.y);
 		}
 		resultantWave.add(new Point(resultantWave_x, zeroY-resultantWave_y));
+		resultantWave.smooth();
 	    }
 	}
 
