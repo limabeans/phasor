@@ -683,6 +683,7 @@ createWaveEqn = function(waveObj) {
     dir_dropdown.add(plus);
     dir_dropdown.addEventListener('change', function() {
 	waveObj.dir=dir_dropdown.value;
+	refreshWaves();
     });
     eqn.appendChild(dir_dropdown);
     //[62.83]
@@ -707,6 +708,7 @@ createWaveEqn = function(waveObj) {
 	    var floatVal = eval(phiInput.value)*Math.PI;
 	    waveObj.phi_slider.value=''+floatVal;
 	    waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
+	    refreshWaves();
 	}
     });
 
@@ -733,6 +735,7 @@ createWaveSlidersDOM = function(waveObj) {
 	waveObj.amplitude=a_slider.value;
 	waveObj.a_span.innerHTML=''+a_slider.value;
 	waveObj.refresh();
+	refreshWaves();
     });
     sliders.appendChild(a_slider);
     waveObj.amp_slider = a_slider;
@@ -755,6 +758,7 @@ createWaveSlidersDOM = function(waveObj) {
 	var omega = calculateOmegaFromK(k);
 	waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
 	waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
+	refreshWaves();
     });
 
 
@@ -780,6 +784,7 @@ createWaveSlidersDOM = function(waveObj) {
 	scaleByPi = parseFloat(scaleByPi).toFixed(3);
 	waveObj.phi_input.value=''+scaleByPi;
 	waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value,phasorOriginPoint), phasorOriginPoint);
+	refreshWaves();
     });
 
 
