@@ -277,8 +277,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.refreshWaveDOM = function() {
 	this.color_dropdown.value = this.color;
 	this.amp_span.innerHTML = this.amplitude;
-	this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(1);
-	this.f2_span.innerHTML = parseFloat(this.frequency).toFixed(1);
+	this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(3);
+	this.f2_span.innerHTML = parseFloat(this.frequency).toFixed(3);
 	this.dir_dropdown.value = this.dir;
 	var phi_scaled = this.phi / Math.PI;
 	this.phi_input.value = phi_scaled;
@@ -750,14 +750,14 @@ createWaveSlidersDOM = function(waveObj) {
     frequency_slider.type='range';
     frequency_slider.className='sliders';
     frequency_slider.min='.5';
-    frequency_slider.max='10';
-    frequency_slider.step='.1';
+    frequency_slider.max='15';
+    frequency_slider.step='.001';
     frequency_slider.value=''+waveObj.frequency;
 
     frequency_slider.addEventListener('input', function() {
 	waveObj.frequency = frequency_slider.value;
 	console.log(waveObj.frequency);
-	var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(1);
+	var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(3);
 	waveObj.lambda_span.innerHTML = lambda;
 	waveObj.f2_span.innerHTML = frequency_slider.value;
 	var k = calculateKFromFrequency(frequency_slider.value);
