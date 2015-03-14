@@ -712,7 +712,7 @@ createWaveEqn = function(waveObj) {
 createWaveSlidersDOM = function(waveObj) {
     var sliders = document.createElement('span');
     var alpha = document.createElement('span');
-    alpha.innerHTML='&alpha;';
+    alpha.innerHTML='A';
     sliders.appendChild(alpha);
 
     var a_slider = document.createElement('input');
@@ -729,9 +729,9 @@ createWaveSlidersDOM = function(waveObj) {
     sliders.appendChild(a_slider);
     waveObj.amp_slider = a_slider;
 
-    var num_wavelengths = document.createElement('span');
-    num_wavelengths.innerHTML = 'f';
-    sliders.appendChild(num_wavelengths);
+    var num_frequency_span = document.createElement('span');
+    num_frequency_span.innerHTML = 'f';
+    sliders.appendChild(num_frequency_span);
 
     var frequency_slider = document.createElement('input');
     frequency_slider.type='range';
