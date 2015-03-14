@@ -82,6 +82,9 @@ var calculateOmegaFromK = function(k) {
 var calculateFrequencyFromOmega = function(omega) {
     return omega/(2*Math.PI);
 };
+var calculateLambdaFromFrequency = function(frequency) {
+    return velocityOfMedium/frequency;
+};
 
 var DEFAULT_AMPL = 1;
 var DEFAULT_K = Math.PI*2/maxWavelength;
@@ -156,9 +159,9 @@ function Wave(a,k,omega,phi,color,d) {
     //Need these to support import/export.
     this.color_dropdown = null;
     this.amp_span = null;
-    this.k_span = null;
+    this.lambda_span = null;
     this.dir_dropdown = null;
-    this.omega_span = null;
+    this.f2_span = null;
     this.phi_input = null;
     this.amp_slider = null;
     this.f_slider = null;
@@ -274,8 +277,8 @@ function Wave(a,k,omega,phi,color,d) {
     this.refreshWaveDOM = function() {
 	this.color_dropdown.value = this.color;
 	this.amp_span.innerHTML = this.amplitude;
-	this.k_span.innerHTML = parseFloat(this.k).toFixed(3);
-	this.omega_span.innerHTML = parseFloat(this.omega).toFixed(2);
+	this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(1);
+	this.f2_span.innerHTML = parseFloat(this.frequency).toFixed(1);
 	this.dir_dropdown.value = this.dir;
 	var phi_scaled = this.phi / Math.PI;
 	this.phi_input.value = phi_scaled;
@@ -661,16 +664,15 @@ createWaveEqn = function(waveObj) {
     waveObj.amp_span=ampl_span;
     eqn.appendChild(ampl_span);
     //sin(
-    var sin_txt = document.createTextNode('sin(');
+    var sin_txt = document.createTextNode('sin( (2\u03C0/');
     eqn.appendChild(sin_txt);
-    //[6.28]
-    var k_span = document.createElement('span');
-    //k_span.innerHTML='6.28';
-    k_span.innerHTML=parseFloat(waveObj.k).toFixed(3);
-    waveObj.k_span = k_span;
-    eqn.appendChild(k_span);
+    
+    var lambda_span = document.createElement('span');
+    waveObj.lambda_span = lambda_span;
+    eqn.appendChild(lambda_span);
+    
     //x
-    var x_txt = document.createTextNode('x ');
+    var x_txt = document.createTextNode(') x ');
     eqn.appendChild(x_txt);
     //[-+]
     var dir_dropdown = document.createElement('select');
@@ -686,15 +688,15 @@ createWaveEqn = function(waveObj) {
 	refreshWaves();
     });
     eqn.appendChild(dir_dropdown);
-    //[62.83]
-    var omega_span = document.createElement('span');
-    omega_span.innerHTML='62.83';
-    waveObj.omega_span=omega_span;
-    //NaN bug here???
-    //waveObj.omega=omega_span.value;
-    eqn.appendChild(omega_span);
+    
+    var two_pi_x = document.createTextNode(' 2\u03C0(');
+    eqn.appendChild(two_pi_x);
+    
+    var f2_span = document.createElement('span');
+    waveObj.f2_span = f2_span;
+    eqn.appendChild(f2_span);
     //t +
-    var t_plus_txt = document.createTextNode('t + ');
+    var t_plus_txt = document.createTextNode(')t + ');
     eqn.appendChild(t_plus_txt);
     //[0]
     var phiInput = document.createElement('input');
@@ -753,10 +755,15 @@ createWaveSlidersDOM = function(waveObj) {
     frequency_slider.value=''+waveObj.frequency;
 
     frequency_slider.addEventListener('input', function() {
+	waveObj.frequency = frequency_slider.value;
+	console.log(waveObj.frequency);
+	var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(1);
+	waveObj.lambda_span.innerHTML = lambda;
+	waveObj.f2_span.innerHTML = frequency_slider.value;
 	var k = calculateKFromFrequency(frequency_slider.value);
-	waveObj.k_span.innerHTML = parseFloat(k).toFixed(3);
 	var omega = calculateOmegaFromK(k);
-	waveObj.omega_span.innerHTML=''+parseFloat(omega).toFixed(2);
+	waveObj.k = k;
+	waveObj.omega = omega;
 	waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
 	refreshWaves();
     });
