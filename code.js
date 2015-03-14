@@ -467,10 +467,10 @@ resetButton.addEventListener('click', function() {
     deleteResultant();
     resetPlayButton();
     resetTimeElapsed();
-    refreshResultant();
     clearExportArea();
     //Re-enable addWaveButton.
     addWaveButton.disabled = false;
+    refreshWaves();
 });
 var resetPlayButton = function() {
     //Modify the play/pause button manually.
