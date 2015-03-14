@@ -175,6 +175,7 @@ function Wave(a,k,omega,phi,color,d) {
     //Other fields related to displaying.
     //TimeDelta used for moving the wave on the screen.
     this.phiTimeDelta=0;
+    this.Xbutton = null;
     this.arrayIndex=-1;
     this.color = color;
     this.path = new Path({strokeColor: this.color, strokeWidth:1});
@@ -299,6 +300,7 @@ function Wave(a,k,omega,phi,color,d) {
 //The loop.
 function onFrame(event) {
     if(play) {
+	disableButtons();
 	if(!setIntervalInitialized) {
 	    if(speedSlider.value!=='0') {
 		setIntervalVariable = setInterval(function() {
@@ -312,6 +314,8 @@ function onFrame(event) {
 	if(showResultant) {
 	    refreshResultant();
 	}
+    } else {
+	enableButtons();
     }
 };
 
@@ -439,6 +443,8 @@ var clearEverything = function() {
     resetPlayButton();
     resetTimeElapsed();
     clearExportArea();
+    //Re-enable addWaveButton.
+    addWaveButton.disabled = false;
 };
 var clearExportArea = function() {
     exportArea.innerHTML = '';    
@@ -460,6 +466,8 @@ resetButton.addEventListener('click', function() {
     resetTimeElapsed();
     refreshResultant();
     clearExportArea();
+    //Re-enable addWaveButton.
+    addWaveButton.disabled = false;
 });
 var resetPlayButton = function() {
     //Modify the play/pause button manually.
@@ -781,6 +789,7 @@ createWaveSlidersDOM = function(waveObj) {
 
     var deleteButton = document.createElement('button');
     deleteButton.innerHTML='X';
+    waveObj.Xbutton = deleteButton;
     deleteButton.addEventListener('click', function() {
 	waveObj.wipe();
 	wavesArray.splice(waveObj.arrayIndex,1);
@@ -808,3 +817,24 @@ createWaveDOM = function(waveObj) {
     waveObj.color_dropdown = colorDropdown;
     return wave;
 };
+
+var disableButtons = function() {
+    addWaveButton.disabled = true;
+    for(var i = 0; i < wavesArray.length; i++) {
+	wavesArray[i].Xbutton.disabled=true;
+	//Disable phi.
+	wavesArray[i].phi_input.disabled=true;
+	wavesArray[i].phi_slider.disabled=true;
+    }
+};
+
+var enableButtons = function() {
+    for(var i = 0; i < wavesArray.length; i++) {
+	wavesArray[i].Xbutton.disabled=false;
+	//Enable phi.
+	wavesArray[i].phi_input.disabled=false;
+	wavesArray[i].phi_slider.disabled=false;
+    }
+
+};
+
