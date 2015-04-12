@@ -159,6 +159,7 @@ function Wave(a,k,omega,phi,color,d) {
   //Need these to support import/export.
   this.color_dropdown = null;
   this.amp_span = null;
+  this.amp_input = null; //new
   this.lambda_span = null;
   this.dir_dropdown = null;
   this.f2_span = null;
@@ -656,11 +657,36 @@ createWaveEqn = function(waveObj) {
   var eqn = document.createElement('span');
   var y_x_t = document.createTextNode('y(x,t) = ');
   eqn.appendChild(y_x_t);
+
+  var amplInput = document.createElement('input');
+  amplInput.value = '1.00';
+  amplInput.size = '4';
+  waveObj.amp_input = amplInput;
+  eqn.appendChild(amplInput);
+  amplInput.addEventListener('keydown', function() {
+    //[enter]
+    if(event.keyCode == 13) {
+      var floatVal = parseFloat(amplInput.value);
+      if(!isNaN(floatVal) && floatVal>=0.00 && floatVal<=2.00) {
+        //should make sure value is within domain
+        waveObj.amp_span.innerHTML = ''+floatVal;
+        waveObj.amp_slider.value=''+floatVal;
+        waveObj.edit(floatVal, waveObj.frequency, 
+                     waveObj.phi, phasorOriginPoint);
+        refreshWaves();
+      } else {
+        //turn red?
+      }
+    }
+  });
+  
   var ampl_span = document.createElement('span');
   waveObj.a_span=ampl_span;
   ampl_span.innerHTML = '1.00';
   waveObj.amp_span=ampl_span;
   eqn.appendChild(ampl_span);
+
+
   var sin_txt = document.createTextNode('sin( ');
   eqn.appendChild(sin_txt);
 
