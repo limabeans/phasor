@@ -161,7 +161,7 @@ function Wave(a,k,omega,phi,color,d) {
   this.amp_input = null; //new
   this.lambda_span = null;
   this.dir_dropdown = null;
-  this.f2_span = null;
+  this.f_input = null; //new
   this.phi_input = null;
   this.amp_slider = null;
   this.f_slider = null;
@@ -279,7 +279,9 @@ function Wave(a,k,omega,phi,color,d) {
 	  //this.amp_span.innerHTML = this.amplitude;
     this.amp_input.value = this.amplitude;
 	  this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(3);
-	  this.f2_span.innerHTML = parseFloat(this.frequency).toFixed(3);
+
+    this.f_input.value = parseFloat(this.frequency).toFixed(3);
+
 	  this.dir_dropdown.value = this.dir;
 	  var phi_scaled = this.phi / Math.PI;
 	  this.phi_input.value = phi_scaled;
@@ -669,6 +671,7 @@ createWaveEqn = function(waveObj) {
       var floatVal = parseFloat(amplInput.value);
       if(!isNaN(floatVal) && floatVal>=0.00 && floatVal<=2.00) {
         //should make sure value is within domain
+        waveObj.amplitude = floatVal;
         waveObj.amp_slider.value=''+floatVal;
         waveObj.edit(floatVal, waveObj.frequency, 
                      waveObj.phi, phasorOriginPoint);
@@ -717,9 +720,37 @@ createWaveEqn = function(waveObj) {
   var two_pi_x = document.createTextNode(' 2\u03C0(');
   eqn.appendChild(two_pi_x);
   
-  var f2_span = document.createElement('span');
-  waveObj.f2_span = f2_span;
-  eqn.appendChild(f2_span);
+  var fInput = document.createElement('input');
+  fInput.size='5';
+  waveObj.f_input = fInput;
+  eqn.appendChild(fInput);
+
+  fInput.addEventListener('keydown', function() {
+    //[enter]
+    if(event.keyCode == 13) {
+      var floatVal = parseFloat(fInput.value);
+      if(!isNaN(floatVal) && floatVal>=.5 && floatVal<=15) {
+        //should make sure value is within domain
+	      waveObj.frequency = floatVal;
+	      var lambda = parseFloat(calculateLambdaFromFrequency(floatVal)).toFixed(3);
+	      waveObj.lambda_span.innerHTML = lambda;
+
+	      waveObj.f_input.value = floatVal;
+
+	      var k = calculateKFromFrequency(floatVal);
+	      var omega = calculateOmegaFromK(k);
+	      waveObj.k = k;
+	      waveObj.omega = omega;
+	      waveObj.edit(waveObj.amplitude, floatVal,
+                     waveObj.phi,phasorOriginPoint);
+	      refreshWaves();
+      } else {
+        //turn red?
+      }
+    }
+  });
+
+
   //t +
   var t_plus_txt = document.createTextNode(')t + ');
   eqn.appendChild(t_plus_txt);
@@ -760,7 +791,7 @@ createWaveSlidersDOM = function(waveObj) {
   a_slider.step='0.01';
   a_slider.addEventListener('input', function() {
 	  waveObj.amplitude=a_slider.value;
-	  waveObj.a_span.innerHTML=''+a_slider.value;
+    waveObj.amp_input.value = a_slider.value;
 	  waveObj.refresh();
 	  refreshWaves();
   });
@@ -781,10 +812,11 @@ createWaveSlidersDOM = function(waveObj) {
 
   frequency_slider.addEventListener('input', function() {
 	  waveObj.frequency = frequency_slider.value;
-	  console.log(waveObj.frequency);
 	  var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(3);
 	  waveObj.lambda_span.innerHTML = lambda;
-	  waveObj.f2_span.innerHTML = frequency_slider.value;
+
+	  waveObj.f_input.value = frequency_slider.value;
+
 	  var k = calculateKFromFrequency(frequency_slider.value);
 	  var omega = calculateOmegaFromK(k);
 	  waveObj.k = k;
