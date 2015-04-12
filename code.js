@@ -158,7 +158,6 @@ function Wave(a,k,omega,phi,color,d) {
   //DOM element reference variables.
   //Need these to support import/export.
   this.color_dropdown = null;
-  this.amp_span = null;
   this.amp_input = null; //new
   this.lambda_span = null;
   this.dir_dropdown = null;
@@ -277,7 +276,8 @@ function Wave(a,k,omega,phi,color,d) {
   //Need to implement this for import/export feature.
   this.refreshWaveDOM = function() {
 	  this.color_dropdown.value = this.color;
-	  this.amp_span.innerHTML = this.amplitude;
+	  //this.amp_span.innerHTML = this.amplitude;
+    this.amp_input.value = this.amplitude;
 	  this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(3);
 	  this.f2_span.innerHTML = parseFloat(this.frequency).toFixed(3);
 	  this.dir_dropdown.value = this.dir;
@@ -669,7 +669,6 @@ createWaveEqn = function(waveObj) {
       var floatVal = parseFloat(amplInput.value);
       if(!isNaN(floatVal) && floatVal>=0.00 && floatVal<=2.00) {
         //should make sure value is within domain
-        waveObj.amp_span.innerHTML = ''+floatVal;
         waveObj.amp_slider.value=''+floatVal;
         waveObj.edit(floatVal, waveObj.frequency, 
                      waveObj.phi, phasorOriginPoint);
@@ -680,13 +679,6 @@ createWaveEqn = function(waveObj) {
     }
   });
   
-  var ampl_span = document.createElement('span');
-  waveObj.a_span=ampl_span;
-  ampl_span.innerHTML = '1.00';
-  waveObj.amp_span=ampl_span;
-  eqn.appendChild(ampl_span);
-
-
   var sin_txt = document.createTextNode('sin( ');
   eqn.appendChild(sin_txt);
 
