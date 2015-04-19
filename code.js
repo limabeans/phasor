@@ -763,6 +763,11 @@ createWaveSlidersDOM = function(waveObj) {
   alpha.innerHTML='A';
   sliders.appendChild(alpha);
 
+  var minispace = document.createElement('span');
+  minispace.innerHTML = '&nbsp;&nbsp;';
+
+  
+
   var a_slider = document.createElement('input');
   a_slider.type='range';
   a_slider.className='sliders'; 
@@ -778,9 +783,13 @@ createWaveSlidersDOM = function(waveObj) {
   sliders.appendChild(a_slider);
   waveObj.amp_slider = a_slider;
 
+  sliders.appendChild(minispace);
+
   var num_frequency_span = document.createElement('span');
   num_frequency_span.innerHTML = 'f';
   sliders.appendChild(num_frequency_span);
+
+  sliders.appendChild(minispace);
 
   var frequency_slider = document.createElement('input');
   frequency_slider.type='range';
@@ -794,9 +803,7 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.frequency = frequency_slider.value;
 	  var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(3);
 	  waveObj.lambda_span.innerHTML = lambda;
-
 	  waveObj.f_input.value = frequency_slider.value;
-
 	  var k = calculateKFromFrequency(frequency_slider.value);
 	  var omega = calculateOmegaFromK(k);
 	  waveObj.k = k;
@@ -807,6 +814,7 @@ createWaveSlidersDOM = function(waveObj) {
 
 
   sliders.appendChild(frequency_slider);
+  sliders.appendChild(minispace);
   waveObj.f_slider = frequency_slider;
 
   var phi = document.createElement('span');
@@ -823,6 +831,8 @@ createWaveSlidersDOM = function(waveObj) {
   sliders.appendChild(phi_slider);
   waveObj.phi_slider = phi_slider;
 
+  sliders.appendChild(minispace);
+
   phi_slider.addEventListener('input', function() {
 	  var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
 	  scaleByPi = parseFloat(scaleByPi).toFixed(3);
@@ -831,10 +841,23 @@ createWaveSlidersDOM = function(waveObj) {
 	  refreshWaves();
   });
 
+  return sliders;
+};
 
-  var space = document.createElement('span');
-  space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-  sliders.appendChild(space);
+createWaveDOM = function(waveObj) {
+  var wave = document.createElement('div');
+  var colorDropdown = createColorDropdown(waveObj);
+  var eqn = createWaveEqn(waveObj);
+  var newline = document.createElement('span');
+  newline.innerHTML='<br>';
+  var sliders = createWaveSlidersDOM(waveObj);
+
+  wave.appendChild(eqn);
+  wave.appendChild(newline);
+
+  wave.appendChild(sliders);
+  wave.appendChild(colorDropdown);
+
 
   var deleteButton = document.createElement('button');
   deleteButton.innerHTML='X';
@@ -846,22 +869,12 @@ createWaveSlidersDOM = function(waveObj) {
 	  refreshResultant();
 	  clearExportArea();
   });
-  
-  sliders.appendChild(deleteButton);
-  return sliders;
-};
+  var space = document.createElement('span');
+  space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';
+  wave.appendChild(space);
+  wave.appendChild(deleteButton);
 
-createWaveDOM = function(waveObj) {
-  var wave = document.createElement('div');
-  var colorDropdown = createColorDropdown(waveObj);
-  var eqn = createWaveEqn(waveObj);
-  var newline = document.createElement('span');
-  newline.innerHTML='<br>';
-  var sliders = createWaveSlidersDOM(waveObj);
-  wave.appendChild(colorDropdown);
-  wave.appendChild(eqn);
-  wave.appendChild(newline);
-  wave.appendChild(sliders);
+
   //Hand the waveObj the necessary reference for color.
   waveObj.color_dropdown = colorDropdown;
   return wave;

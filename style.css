@@ -22,18 +22,21 @@ select::-ms-expand {
     width: 70%;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 
 #adderArea {
     margin-left:70%;
-    
-
 }
 
 
 .tables {
     border-collapse: collapse;
     height: 100%;
-    width: 30%;
+    width: 29%;
 }
 
 td, th {
@@ -44,6 +47,7 @@ td, th {
 #exportArea {
     margin-left: 70%;
     border: 1px solid black;
+    width: 29%;
 }
 
 #config {
