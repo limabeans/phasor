@@ -6,31 +6,34 @@
     <script type="text/paperscript" canvas="waveCanvas" src="code.js"></script>
   </head>
   <body>
-    <input type="file" id="import" />
-    <button id="play">Play</button>
-    <button id="reset">Reset</button>
-    <button id="clear">Clear</button>
-    <span id="speed_val">1</span>x
-    <input class="sliders" type="range" id="speed" min="0" max="5" step=".5" value="1" />
+    <div class="container">
+      <input type="file" id="import" />
+      <button id="play">Play</button>
+      <button id="reset">Reset</button>
+      <button id="clear">Clear</button>
+      <span id="speed_val">1</span>x
+      <input class="sliders" type="range" id="speed" min="0" max="5" step=".5" value="1" />
 
-    <select id="phasor_tails">
-      <option value="tails_at_origin">Tails at origin</option>
-      <option value="vector_addition">Vector addition</option>
-    </select>
-    <select id="wave_option">
-      <option value="show_all">Show all</option>
-      <option value="resultant_only">Resultant only</option>
-      <option value="individual_only">Individual only</option>
-    </select>
-    <button id="export_waves">Export</button>
-    <button id="add_wave">Add wave</button>
-    <br>
-
-    <canvas id="waveCanvas" keepalive="true"></canvas>
-    <!-- Table goes inside of adderArea. -->
-    <div class="center" id="adderArea"> </div> 
-    <textarea id="exportArea" rows="6" cols="45"></textarea>
-    
-    <div id="footer"><h1><span id="time_elapsed">0</span> seconds. Medium: 10 m/s</h1></div>
+      <select id="phasor_tails">
+        <option value="tails_at_origin">Tails at origin</option>
+        <option value="vector_addition">Vector addition</option>
+      </select>
+      <select id="wave_option">
+        <option value="show_all">Show all</option>
+        <option value="resultant_only">Resultant only</option>
+        <option value="individual_only">Individual only</option>
+      </select>
+      <button id="export_waves">Export</button>
+      <button id="add_wave">Add wave</button>
+      <br>
+      <div id="container">
+        <canvas id="waveCanvas" keepalive="true"></canvas>
+      </div>
+      <!-- Table goes inside of adderArea. -->
+      <div class="center" id="adderArea"> </div> 
+      <textarea id="exportArea" rows="6" cols="45"></textarea>
+      
+      <div id="footer"><h1><span id="time_elapsed">0</span> seconds. Medium: 10 m/s</h1></div>
+    </div>
   </body>
 </html>

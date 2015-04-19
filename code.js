@@ -1,5 +1,12 @@
 //Global variables.
 var canvas = document.getElementById("waveCanvas");
+
+//Apparently canvas pixel width and height and 
+//the css of the canvas width height are two separate things...
+//awkward. 
+canvas.width=.7*document.body.clientWidth;
+canvas.height=.7*document.body.clientHeight;
+
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
 var pixelWavelength = (canvas.width - zeroX);
@@ -667,16 +674,6 @@ createWaveEqn = function(waveObj) {
   
   var sin_txt = document.createTextNode('sin( ');
   eqn.appendChild(sin_txt);
-
-  // var frac_table = document.createElement('table');
-  // var tr = document.createElement('tr');
-  // var td1 = document.createElement('td');
-  // //td1.style = 'border-bottom:solid 1px';
-  // td1.innerHTML = '1';
-  // tr.appendChild(td1);
-  // frac_table.appendChild(tr);
-  // eqn.appendChild(frac_table);
-
   var two_pi = document.createTextNode('2\u03C0/');
   eqn.appendChild(two_pi);
 
