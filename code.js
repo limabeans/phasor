@@ -33,23 +33,16 @@ var phasorOrigin = new Path.Circle({
   radius:5,
   strokeColor:'purple'
 });
-
 var amplTick = new Path.Line({
   from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
   to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
   strokeColor: 'green'
 });
-
 var wavelengthTick = new Path.Line({
   from: [zeroX + pixelWavelength/2, -10 + zeroY],
   to: [zeroX + pixelWavelength/2 ,10 + zeroY],
   strokeColor: 'red'
   
-});
-var phasorXaxis = new Path.Line({
-  from: [0, zeroY],
-  to: [canvas.height, zeroY],
-  strokeColor: 'black'
 });
 var phasorYaxis = new Path.Line({
   from: [zeroX/2,0],
@@ -62,9 +55,13 @@ var dividerLine = new Path.Line({
   to: [canvas.height, canvas.height],
   strokeColor: 'purple'
 });
-var midwayLine = new Path.Line({
-  from: [canvas.height,zeroY],
-  to: [canvas.width, zeroY],
+
+//When using python -m SimpleHTTPServer,
+//canvas.width doesn't extend to end for some reason.
+//Unsure why, but hackily fixed it with 2*canvas.width :^|
+var xAxis = new Path.Line({
+  from: [0,zeroY],
+  to: [2*canvas.width,zeroY],
   strokeColor: 'black'
 });
 
