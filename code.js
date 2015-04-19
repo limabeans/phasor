@@ -33,28 +33,13 @@ var phasorOrigin = new Path.Circle({
   radius:5,
   strokeColor:'purple'
 });
-var amplTick = new Path.Line({
-  from:[zeroX-10, zeroY - (canvas.height/2)/maxAmpl],
-  to:[zeroX+10, zeroY - (canvas.height/2)/maxAmpl],
-  strokeColor: 'green'
-});
-var wavelengthTick = new Path.Line({
-  from: [zeroX + pixelWavelength/2, -10 + zeroY],
-  to: [zeroX + pixelWavelength/2 ,10 + zeroY],
-  strokeColor: 'red'
-  
-});
+
 var phasorYaxis = new Path.Line({
   from: [zeroX/2,0],
-  to: [zeroX/2,canvas.height],
+  to: [zeroX/2,2*canvas.height],
   strokeColor: 'black'
 });
 
-var dividerLine = new Path.Line({
-  from: [canvas.height,0],
-  to: [canvas.height, canvas.height],
-  strokeColor: 'purple'
-});
 
 //When using python -m SimpleHTTPServer,
 //canvas.width doesn't extend to end for some reason.
@@ -63,6 +48,12 @@ var xAxis = new Path.Line({
   from: [0,zeroY],
   to: [2*canvas.width,zeroY],
   strokeColor: 'black'
+});
+
+var midline = new Path.Line({
+  from: [canvas.height,0],
+  to: [canvas.height, 2*canvas.height],
+  strokeColor: 'purple'
 });
 
 //Calculate helpers.
@@ -94,13 +85,14 @@ var DEFAULT_DIR = '-';
 
 //Handling the timer.
 var time_elapsed = document.getElementById('time_elapsed');
+
 var resetTimeElapsed = function() {
   currentTime=0;
   clearInterval(setIntervalVariable);
   setIntervalInitialized=false;
   time_elapsed.innerHTML='0';
-
 };
+
 var incrementTimeElapsed = function(timeStep) {
   var scaledTime = .1;
   currentTime+=scaledTime;
@@ -155,10 +147,10 @@ function Wave(a,k,omega,phi,color,d) {
   //DOM element reference variables.
   //Need these to support import/export.
   this.color_dropdown = null;
-  this.amp_input = null; //new
+  this.amp_input = null; 
   this.lambda_span = null;
   this.dir_dropdown = null;
-  this.f_input = null; //new
+  this.f_input = null;
   this.phi_input = null;
   this.amp_slider = null;
   this.f_slider = null;
@@ -273,12 +265,9 @@ function Wave(a,k,omega,phi,color,d) {
   //Need to implement this for import/export feature.
   this.refreshWaveDOM = function() {
 	  this.color_dropdown.value = this.color;
-	  //this.amp_span.innerHTML = this.amplitude;
     this.amp_input.value = this.amplitude;
 	  this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(3);
-
     this.f_input.value = parseFloat(this.frequency).toFixed(3);
-
 	  this.dir_dropdown.value = this.dir;
 	  var phi_scaled = this.phi / Math.PI;
 	  this.phi_input.value = phi_scaled;
@@ -616,9 +605,6 @@ var writeExportArea = function() {
   }
   
 };
-
-
-
 
 
 //Helpers to create the wave DOM.
