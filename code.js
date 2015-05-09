@@ -796,6 +796,8 @@ createWaveSlidersDOM = function(waveObj) {
       for(var i = 0; i < wavesArray.length; i++) {
         var delta = a_slider.value - waveObj.amplitude;
         var new_ampl = parseFloat(wavesArray[i].amp_slider.value)+delta;
+        if(new_ampl<0) { new_ampl=0; }
+        if(new_ampl>2) { new_ampl=2; }
         if(waveObj.arrayIndex!=i && new_ampl<=2 && new_ampl>=0) {
           wavesArray[i].amp_slider.value=new_ampl;
           wavesArray[i].amplitude=new_ampl;
@@ -836,8 +838,10 @@ createWaveSlidersDOM = function(waveObj) {
       var delta = parseFloat(waveObj.f_slider.value)-waveObj.frequency;
       for(var i = 0; i < wavesArray.length; i++) {
         var new_freq = delta + parseFloat(wavesArray[i].f_slider.value);
-        console.log(new_freq);
-        if(waveObj.arrayIndex!=i && new_freq>=0.5 && new_freq<=15) {
+        
+        if(new_freq>15) { new_freq = 15; }
+        if(new_freq<0.5) { new_freq = 0.5; }
+        if(waveObj.arrayIndex!=i) {
 	        wavesArray[i].frequency = new_freq;
           wavesArray[i].f_slider.value = new_freq;
 	        var lambda = parseFloat(calculateLambdaFromFrequency(new_freq)).toFixed(3);
