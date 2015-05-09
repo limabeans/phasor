@@ -833,7 +833,7 @@ createWaveSlidersDOM = function(waveObj) {
   waveObj.f_slider = frequency_slider;
   frequency_slider.addEventListener('input', function() {
     if(f_locked) {
-      var delta = parseFloat(waveObj.f_slider.value)-waveObj.frequency;    
+      var delta = parseFloat(waveObj.f_slider.value)-waveObj.frequency;
       for(var i = 0; i < wavesArray.length; i++) {
         var new_freq = delta + parseFloat(wavesArray[i].f_slider.value);
         console.log(new_freq);
@@ -892,19 +892,21 @@ createWaveSlidersDOM = function(waveObj) {
   phi_slider.addEventListener('input', function() {
     if(phi_locked) {
       for(var i = 0; i < wavesArray.length; i++) {
-        var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
-        var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
-        if(waveObj.arrayIndex!=i && new_phi>=-6.29 
-           && new_phi<=6.29) {
+
+      var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
+      var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
+
+        if(waveObj.arrayIndex!=i && new_phi>=-7
+           && new_phi<=7) {
           wavesArray[i].phi_slider.value=new_phi;
           wavesArray[i].phi=new_phi;
           wavesArray[i].refresh();
 
-	        var scaleByPi = parseFloat(phi_slider.value) / Math.PI;
+	        var scaleByPi = parseFloat(wavesArray[i].phi) / Math.PI;
 	        scaleByPi = parseFloat(scaleByPi).toFixed(3);
           //Edit textual phi input.
 	        wavesArray[i].phi_input.value=''+scaleByPi;
-	        wavesArray[i].edit(wavesArray[i].amplitude,wavesArray[i].frequency, parseFloat(phi_slider.value), phasorOriginPoint);
+	        wavesArray[i].edit(wavesArray[i].amplitude,wavesArray[i].frequency, parseFloat(wavesArray[i].phi), phasorOriginPoint);
         }
       }
     }
