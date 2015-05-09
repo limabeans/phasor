@@ -7,6 +7,8 @@ var canvas = document.getElementById("waveCanvas");
 canvas.width=.7*document.body.clientWidth;
 canvas.height=.7*document.body.clientHeight;
 
+var MAX_NUMBER_OF_WAVES = 10;
+
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
 var pixelWavelength = (canvas.width - zeroX);
@@ -506,7 +508,7 @@ addWaveButton.addEventListener('click', function() {
 
 //Button #5. addWave button.
 var addWave = function() {
-  if(wavesArray.length<5) {
+  if(wavesArray.length<MAX_NUMBER_OF_WAVES) {
 	  var k = Math.PI*2/maxWavelength;
 	  var omega = calculateOmegaFromK(k);
 	  wavesArray.push(new Wave(DEFAULT_AMPL,
@@ -523,7 +525,7 @@ var addWave = function() {
 };
 
 var addCustomWave = function(ampl,k,omega,phi,color,dir) {
-  if(wavesArray.length<5) {
+  if(wavesArray.length<MAX_NUMBER_OF_WAVES) {
 
 	  wavesArray.push(new Wave(ampl,k,omega,phi,color,dir));
 	  refreshWaveDiv();
