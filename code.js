@@ -830,8 +830,31 @@ createWaveSlidersDOM = function(waveObj) {
   frequency_slider.max='15';
   frequency_slider.step='.001';
   frequency_slider.value=''+waveObj.frequency;
-
+  waveObj.f_slider = frequency_slider;
   frequency_slider.addEventListener('input', function() {
+    if(f_locked) {
+      var delta = parseFloat(waveObj.f_slider.value)-waveObj.frequency;    
+      for(var i = 0; i < wavesArray.length; i++) {
+        var new_freq = delta + parseFloat(wavesArray[i].f_slider.value);
+        console.log(new_freq);
+        if(waveObj.arrayIndex!=i && new_freq>=0.5 && new_freq<=15) {
+	        wavesArray[i].frequency = new_freq;
+          wavesArray[i].f_slider.value = new_freq;
+	        var lambda = parseFloat(calculateLambdaFromFrequency(new_freq)).toFixed(3);
+          console.log(lambda);
+	        wavesArray[i].lambda_span.innerHTML = ''+lambda;
+	        wavesArray[i].f_input.value = parseFloat(new_freq).toFixed(3);
+	        var k = calculateKFromFrequency(new_freq);
+	        var omega = calculateOmegaFromK(k);
+	        wavesArray[i].k = k;
+	        wavesArray[i].omega = omega;
+	        wavesArray[i].edit(wavesArray[i].amplitude, wavesArray[i].frequency, wavesArray[i].phi,phasorOriginPoint);        
+          wavesArray[i].refresh();
+        }
+      }
+    }
+    
+    //Edit the current waveObj's frequency stuff.
 	  waveObj.frequency = frequency_slider.value;
 	  var lambda = parseFloat(calculateLambdaFromFrequency(frequency_slider.value)).toFixed(3);
 	  waveObj.lambda_span.innerHTML = lambda;
@@ -841,13 +864,14 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.k = k;
 	  waveObj.omega = omega;
 	  waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
+
 	  refreshWaves();
   });
 
 
   sliders.appendChild(frequency_slider);
   sliders.appendChild(minispace);
-  waveObj.f_slider = frequency_slider;
+
 
   var phi = document.createElement('span');
   phi.innerHTML='&phi;';
@@ -869,8 +893,6 @@ createWaveSlidersDOM = function(waveObj) {
     if(phi_locked) {
       for(var i = 0; i < wavesArray.length; i++) {
         var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
-        //delta = parseFloat(delta).toFixed(8);
-        console.log(delta);
         var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
         if(waveObj.arrayIndex!=i && new_phi>=-6.29 
            && new_phi<=6.29) {
