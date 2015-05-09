@@ -33,6 +33,25 @@ var showResultant=true;
 var setIntervalInitialized=false;
 var setIntervalVariable = null;
 
+var a_locked = false;
+var a_lock_checkbox = document.getElementById('lock_a');
+a_lock_checkbox.addEventListener('change', function() {
+  a_locked = a_lock_checkbox.checked;
+});
+
+var f_locked = false;
+var f_lock_checkbox = document.getElementById('lock_f');
+f_lock_checkbox.addEventListener('change', function() {
+  f_locked = f_lock_checkbox.checked;
+});
+
+var phi_locked = false;
+var phi_lock_checkbox = document.getElementById('lock_phi');
+phi_lock_checkbox.addEventListener('change', function() {
+  phi_locked = phi_lock_checkbox.checked;
+});
+
+
 
 //Draw the outline to screen.
 var phasorOrigin = new Path.Circle({
