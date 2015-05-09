@@ -785,8 +785,6 @@ createWaveSlidersDOM = function(waveObj) {
   var minispace = document.createElement('span');
   minispace.innerHTML = '&nbsp;&nbsp;';
 
-  
-
   var a_slider = document.createElement('input');
   a_slider.type='range';
   a_slider.className='sliders'; 
@@ -794,9 +792,24 @@ createWaveSlidersDOM = function(waveObj) {
   a_slider.max='2';
   a_slider.step='0.01';
   a_slider.addEventListener('input', function() {
+    if(a_locked) {
+      for(var i = 0; i < wavesArray.length; i++) {
+        var delta = a_slider.value - waveObj.amplitude;
+        var new_ampl = parseFloat(wavesArray[i].amp_slider.value)+delta;
+        if(waveObj.arrayIndex!=i && new_ampl<=2 && new_ampl>=0) {
+          wavesArray[i].amp_slider.value=new_ampl;
+          wavesArray[i].amplitude=new_ampl;
+          wavesArray[i].amp_input.value = new_ampl;
+          wavesArray[i].refresh();
+        }
+      }
+    }
+    //update the original waveObj
 	  waveObj.amplitude=a_slider.value;
     waveObj.amp_input.value = a_slider.value;
 	  waveObj.refresh();
+
+
 	  refreshWaves();
   });
   sliders.appendChild(a_slider);
