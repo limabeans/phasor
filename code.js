@@ -896,8 +896,8 @@ createWaveSlidersDOM = function(waveObj) {
       var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
       var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
 
-        if(waveObj.arrayIndex!=i && new_phi>=-7
-           && new_phi<=7) {
+        if(waveObj.arrayIndex!=i && new_phi>=-6.283185307179586
+           && new_phi<=6.283185307179586) {
           wavesArray[i].phi_slider.value=new_phi;
           wavesArray[i].phi=new_phi;
           wavesArray[i].refresh();
@@ -918,6 +918,9 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.phi_input.value=''+scaleByPi;
 	  waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value), phasorOriginPoint);
 
+    for(var i = 0; i < wavesArray.length; i++) {
+      console.log(wavesArray[i].phi);
+    }
 
 	  refreshWaves();
   });
