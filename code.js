@@ -896,8 +896,9 @@ createWaveSlidersDOM = function(waveObj) {
       var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
       var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
 
-        if(waveObj.arrayIndex!=i && new_phi>=-6.283185307179586
-           && new_phi<=6.283185307179586) {
+        if(new_phi>6.283) { new_phi=6.283185307179586; }
+        if(new_phi<-6.283) { new_phi=-6.283185307179586; }
+        if(waveObj.arrayIndex!=i) {
           wavesArray[i].phi_slider.value=new_phi;
           wavesArray[i].phi=new_phi;
           wavesArray[i].refresh();
@@ -907,6 +908,7 @@ createWaveSlidersDOM = function(waveObj) {
           //Edit textual phi input.
 	        wavesArray[i].phi_input.value=''+scaleByPi;
 	        wavesArray[i].edit(wavesArray[i].amplitude,wavesArray[i].frequency, parseFloat(wavesArray[i].phi), phasorOriginPoint);
+          console.log(wavesArray[i].phi);
         }
       }
     }
@@ -917,10 +919,6 @@ createWaveSlidersDOM = function(waveObj) {
     //Edit textual phi input.
 	  waveObj.phi_input.value=''+scaleByPi;
 	  waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value), phasorOriginPoint);
-
-    for(var i = 0; i < wavesArray.length; i++) {
-      console.log(wavesArray[i].phi);
-    }
 
 	  refreshWaves();
   });
