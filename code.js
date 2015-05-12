@@ -972,6 +972,7 @@ var disableButtons = function() {
     //Disable delete button.
 	  wavesArray[i].Xbutton.disabled=true;
 
+    //Disable all the stuff.
     wavesArray[i].color_dropdown.disabled=true;
     wavesArray[i].amp_input.disabled=true;
     wavesArray[i].lambda_span.disabled=true;
@@ -982,6 +983,12 @@ var disableButtons = function() {
     wavesArray[i].f_slider.disabled=true;
     wavesArray[i].phi_slider.disabled=true;
 
+    //Lock buttons.
+    a_lock_checkbox.disabled=true;
+    f_lock_checkbox.disabled=true;
+    phi_lock_checkbox.disabled=true;
+    
+
   }
 };
 
@@ -990,6 +997,7 @@ var enableButtons = function() {
     //Enable delete button.
 	  wavesArray[i].Xbutton.disabled=false;
 
+    //Enable all the stuff.
     wavesArray[i].color_dropdown.disabled=false;
     wavesArray[i].amp_input.disabled=false;
     wavesArray[i].lambda_span.disabled=false;
@@ -999,6 +1007,12 @@ var enableButtons = function() {
     wavesArray[i].amp_slider.disabled=false;
     wavesArray[i].f_slider.disabled=false;
     wavesArray[i].phi_slider.disabled=false;
+
+
+    //Lock buttons.
+    a_lock_checkbox.disabled=false;
+    f_lock_checkbox.disabled=false;
+    phi_lock_checkbox.disabled=false;
 
   }
 
