@@ -296,7 +296,9 @@ function Wave(a,k,omega,phi,color,d) {
     this.amp_input.value = this.amplitude;
 	  this.lambda_span.innerHTML = parseFloat(calculateLambdaFromFrequency(this.frequency)).toFixed(3);
     this.f_input.value = parseFloat(this.frequency).toFixed(3);
-	  this.dir_dropdown.value = this.dir;
+
+    this.dir_dropdown.value = this.dir;
+
 	  var phi_scaled = this.phi / Math.PI;
 	  this.phi_input.value = phi_scaled;
 
@@ -346,9 +348,10 @@ refreshWaves = function() {
 	  var omega = parseFloat(wavesArray[i].omega);
 	  //Shouldn't simulate timeStep unless your on play!
 	  if(play) {
+      console.log(wavesArray[i].dir);
 	    if(wavesArray[i].dir==='-') {
 		    wavesArray[i].phiTimeDelta -= omega*timeStep;
-	    } else {
+      } else {
 		    wavesArray[i].phiTimeDelta += omega*timeStep;
 	    }
 	  }
@@ -462,12 +465,8 @@ var clearEverything = function() {
   refreshWaveDiv();
   resetPlayButton();
   resetTimeElapsed();
-  clearExportArea();
   //Re-enable addWaveButton.
   addWaveButton.disabled = false;
-};
-var clearExportArea = function() {
-  exportArea.innerHTML = '';    
 };
 
 var deleteResultant = function() {
@@ -484,7 +483,6 @@ resetButton.addEventListener('click', function() {
   deleteResultant();
   resetPlayButton();
   resetTimeElapsed();
-  clearExportArea();
   //Re-enable addWaveButton.
   addWaveButton.disabled = false;
   refreshWaves();
@@ -526,7 +524,6 @@ var addWave = function() {
 
 var addCustomWave = function(ampl,k,omega,phi,color,dir) {
   if(wavesArray.length<MAX_NUMBER_OF_WAVES) {
-
 	  wavesArray.push(new Wave(ampl,k,omega,phi,color,dir));
 	  refreshWaveDiv();
 	  if(showResultant) {
@@ -616,24 +613,23 @@ importButton.addEventListener('change', function(e) {
 });
 
 var exportButton = document.getElementById('export_waves');
-var exportArea = document.getElementById('exportArea');
 exportButton.addEventListener('click', function() {
-  writeExportArea();
+  exportToCSV();
+  
 });
 
-var writeExportArea = function() {
+var exportToCSV = function() {
   if(wavesArray.length>0) {
 	  var text = '';
 	  for(var i = 0; i < wavesArray.length; i++) {
 	    text = text + wavesArray[i].toString() + '\r\n';
 	  }
-	  exportArea.innerHTML = text;
+    window.open('data:text/csv;charset=utf-8,' + escape(text));
   } else {
-	  exportArea.innerHTML = 'No waves to export . . .';
+    alert('No waves to export.');
   }
   
 };
-
 
 //Helpers to create the wave DOM.
 createColorDropdown = function(waveObj) {
@@ -956,7 +952,6 @@ createWaveDOM = function(waveObj) {
 	  wavesArray.splice(waveObj.arrayIndex,1);
 	  refreshWaveDiv();
 	  refreshResultant();
-	  clearExportArea();
   });
   var space = document.createElement('span');
   space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';
