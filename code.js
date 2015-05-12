@@ -969,19 +969,37 @@ createWaveDOM = function(waveObj) {
 var disableButtons = function() {
   addWaveButton.disabled = true;
   for(var i = 0; i < wavesArray.length; i++) {
+    //Disable delete button.
 	  wavesArray[i].Xbutton.disabled=true;
-	  //Disable phi.
-	  wavesArray[i].phi_input.disabled=true;
-	  wavesArray[i].phi_slider.disabled=true;
+
+    wavesArray[i].color_dropdown.disabled=true;
+    wavesArray[i].amp_input.disabled=true;
+    wavesArray[i].lambda_span.disabled=true;
+    wavesArray[i].dir_dropdown.disabled=true;
+    wavesArray[i].f_input.disabled=true;
+    wavesArray[i].phi_input.disabled=true;
+    wavesArray[i].amp_slider.disabled=true;
+    wavesArray[i].f_slider.disabled=true;
+    wavesArray[i].phi_slider.disabled=true;
+
   }
 };
 
 var enableButtons = function() {
   for(var i = 0; i < wavesArray.length; i++) {
+    //Enable delete button.
 	  wavesArray[i].Xbutton.disabled=false;
-	  //Enable phi.
-	  wavesArray[i].phi_input.disabled=false;
-	  wavesArray[i].phi_slider.disabled=false;
+
+    wavesArray[i].color_dropdown.disabled=false;
+    wavesArray[i].amp_input.disabled=false;
+    wavesArray[i].lambda_span.disabled=false;
+    wavesArray[i].dir_dropdown.disabled=false;
+    wavesArray[i].f_input.disabled=false;
+    wavesArray[i].phi_input.disabled=false;
+    wavesArray[i].amp_slider.disabled=false;
+    wavesArray[i].f_slider.disabled=false;
+    wavesArray[i].phi_slider.disabled=false;
+
   }
 
 };
