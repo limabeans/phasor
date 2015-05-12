@@ -592,7 +592,8 @@ importButton.addEventListener('change', function(e) {
   reader.onload = function(e) {
 	  clearEverything();
 	  var contents = e.target.result;
-	  var arr = contents.split("\n");
+	  var arr = contents.split("!!!");
+    console.log(arr);
 	  for(var i = 0; i < arr.length; i++) {
 	    var waveParts = arr[i].split(",");
 	    var ampl = parseFloat(waveParts[0]);
@@ -601,6 +602,7 @@ importButton.addEventListener('change', function(e) {
 	    var phi = parseFloat(waveParts[3]);
 	    var color = waveParts[4];
 	    var dir = waveParts[5];
+      console.log(waveParts);
 	    if(!isNaN(ampl) && !isNaN(k) && !isNaN(omega) &&
 	       !isNaN(phi)) {
 		    addCustomWave(ampl,k,omega,phi,color,dir);
@@ -622,9 +624,9 @@ var exportToCSV = function() {
   if(wavesArray.length>0) {
 	  var text = '';
 	  for(var i = 0; i < wavesArray.length; i++) {
-	    text = text + wavesArray[i].toString() + '\r\n';
+	    text = text + wavesArray[i].toString()+'!!!';
 	  }
-    window.open('data:text/csv;charset=utf-8,' + escape(text));
+    window.open('data:text/csv;charset=utf-8,'+text);
   } else {
     alert('No waves to export.');
   }
