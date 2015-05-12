@@ -911,8 +911,8 @@ createWaveSlidersDOM = function(waveObj) {
     if(phi_locked) {
       for(var i = 0; i < wavesArray.length; i++) {
 
-      var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
-      var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
+        var delta = parseFloat(waveObj.phi_slider.value)-waveObj.phi;
+        var new_phi = parseFloat(wavesArray[i].phi_slider.value) + delta;
 
         if(new_phi>6.283) { new_phi=6.283185307179586; }
         if(new_phi<-6.283) { new_phi=-6.283185307179586; }
