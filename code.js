@@ -437,6 +437,15 @@ var drawArrow = function(phasorPath, offsetPoint, referenceOrigin,color,width) {
 //buttons
 //Button #1. PLAY button.
 var playButton = document.getElementById('play');
+//Initially set to disabled, since no waves are added.
+var maybeDisablePlayButton = function() {
+  if(wavesArray.length===0) {
+    playButton.disabled=true;  
+  }
+};
+var enablePlayButton = function() {
+  playButton.disabled=false;  
+};
 playButton.addEventListener('click', function() {
   play=!play;
   if(!play) { //Pause.
@@ -449,10 +458,12 @@ playButton.addEventListener('click', function() {
 	  playButton.innerHTML = 'Play';
   }
 });
+maybeDisablePlayButton();
 //Button #2. CLEAR button.
 var clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function() {
   clearEverything();
+  maybeDisablePlayButton();
 });
 var clearEverything = function() {
   for(var i=0; i<wavesArray.length; i++) {
@@ -518,6 +529,7 @@ var addWave = function() {
 	  if(showResultant) {
 	    refreshResultant();
 	  }
+    enablePlayButton();
   }
 };
 
@@ -528,6 +540,7 @@ var addCustomWave = function(ampl,k,omega,phi,color,dir) {
 	  if(showResultant) {
 	    refreshResultant();
 	  }
+    enablePlayButton();
   }
 };
 
@@ -954,6 +967,7 @@ createWaveDOM = function(waveObj) {
 	  wavesArray.splice(waveObj.arrayIndex,1);
 	  refreshWaveDiv();
 	  refreshResultant();
+    maybeDisablePlayButton();
   });
   var space = document.createElement('span');
   space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';
