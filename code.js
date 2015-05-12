@@ -348,7 +348,6 @@ refreshWaves = function() {
 	  var omega = parseFloat(wavesArray[i].omega);
 	  //Shouldn't simulate timeStep unless your on play!
 	  if(play) {
-      console.log(wavesArray[i].dir);
 	    if(wavesArray[i].dir==='-') {
 		    wavesArray[i].phiTimeDelta -= omega*timeStep;
       } else {
@@ -593,7 +592,6 @@ importButton.addEventListener('change', function(e) {
 	  clearEverything();
 	  var contents = e.target.result;
 	  var arr = contents.split("!!!");
-    console.log(arr);
 	  for(var i = 0; i < arr.length; i++) {
 	    var waveParts = arr[i].split(",");
 	    var ampl = parseFloat(waveParts[0]);
@@ -610,6 +608,8 @@ importButton.addEventListener('change', function(e) {
 		    refreshResultant();
 	    }
 	  }
+    //Refresh all waves
+    refreshWaves();
   };
   reader.readAsText(file);
 });
