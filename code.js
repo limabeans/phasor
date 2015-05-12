@@ -661,6 +661,7 @@ createColorDropdown = function(waveObj) {
   select.addEventListener('change', function() {
 	  waveObj.color=select.value;
 	  waveObj.refresh();
+    refreshWaves();
   });
   return select;
 };
