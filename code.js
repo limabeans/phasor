@@ -457,6 +457,7 @@ playButton.addEventListener('click', function() {
   } else {
 	  playButton.innerHTML = 'Play';
   }
+  disablePhi();
 });
 maybeDisablePlayButton();
 //Button #2. CLEAR button.
@@ -464,6 +465,7 @@ var clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function() {
   clearEverything();
   maybeDisablePlayButton();
+  enableButtons();
 });
 var clearEverything = function() {
   for(var i=0; i<wavesArray.length; i++) {
@@ -496,6 +498,7 @@ resetButton.addEventListener('click', function() {
   //Re-enable addWaveButton.
   addWaveButton.disabled = false;
   refreshWaves();
+  enableButtons();
 });
 var resetPlayButton = function() {
   //Modify the play/pause button manually.
@@ -980,6 +983,23 @@ createWaveDOM = function(waveObj) {
   return wave;
 };
 
+var disablePhi = function() {
+  for(var i = 0; i < wavesArray.length; i++) {
+    wavesArray[i].phi_input.disabled=true;
+    wavesArray[i].phi_slider.disabled=true;
+  }
+  phi_lock_checkbox.disabled=true;
+};
+
+var enablePhi = function() {
+  for(var i = 0; i < wavesArray.length; i++) {
+    wavesArray[i].phi_input.disabled=false;
+    wavesArray[i].phi_slider.disabled=false;
+  }
+  phi_lock_checkbox.disabled=false;
+};
+
+
 var disableButtons = function() {
   addWaveButton.disabled = true;
   for(var i = 0; i < wavesArray.length; i++) {
@@ -996,14 +1016,12 @@ var disableButtons = function() {
     wavesArray[i].amp_slider.disabled=true;
     wavesArray[i].f_slider.disabled=true;
     wavesArray[i].phi_slider.disabled=true;
-
-    //Lock buttons.
-    a_lock_checkbox.disabled=true;
-    f_lock_checkbox.disabled=true;
-    phi_lock_checkbox.disabled=true;
-    
-
   }
+  //Lock buttons.
+  a_lock_checkbox.disabled=true;
+  f_lock_checkbox.disabled=true;
+  phi_lock_checkbox.disabled=true;
+
 };
 
 var enableButtons = function() {
@@ -1017,18 +1035,18 @@ var enableButtons = function() {
     wavesArray[i].lambda_span.disabled=false;
     wavesArray[i].dir_dropdown.disabled=false;
     wavesArray[i].f_input.disabled=false;
-    wavesArray[i].phi_input.disabled=false;
     wavesArray[i].amp_slider.disabled=false;
     wavesArray[i].f_slider.disabled=false;
-    wavesArray[i].phi_slider.disabled=false;
 
-
-    //Lock buttons.
-    a_lock_checkbox.disabled=false;
-    f_lock_checkbox.disabled=false;
-    phi_lock_checkbox.disabled=false;
-
+    //phi: Only enable if time has just started.
+    if(currentTime===0) {
+      wavesArray[i].phi_slider.disabled=false;
+      wavesArray[i].phi_input.disabled=false;
+      phi_lock_checkbox.disabled=false;
+    }
   }
-
+  //Lock buttons.
+  a_lock_checkbox.disabled=false;
+  f_lock_checkbox.disabled=false;
 };
 
