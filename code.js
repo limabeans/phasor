@@ -708,9 +708,11 @@ createWaveEqn = function(waveObj) {
         waveObj.amp_slider.value=''+floatVal;
         waveObj.edit(floatVal, waveObj.frequency, 
                      waveObj.phi, phasorOriginPoint);
+        amplInput.style.backgroundColor='white';
         refreshWaves();
       } else {
-        //turn red?
+        //Error: turn red.
+        amplInput.style.backgroundColor='#FF6666';
       }
     }
   });
@@ -766,9 +768,10 @@ createWaveEqn = function(waveObj) {
 	      waveObj.omega = omega;
 	      waveObj.edit(waveObj.amplitude, floatVal,
                      waveObj.phi,phasorOriginPoint);
+        fInput.style.backgroundColor='white';
 	      refreshWaves();
       } else {
-        //turn red?
+        fInput.style.backgroundColor='#FF6666';
       }
     }
   });
@@ -787,9 +790,16 @@ createWaveEqn = function(waveObj) {
 	  //[enter] 
 	  if(event.keyCode == 13) {
 	    var floatVal = eval(phiInput.value)*Math.PI;
-	    waveObj.phi_slider.value=''+floatVal;
-	    waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
-	    refreshWaves();
+      if(!isNaN(floatVal) && floatVal>=-2*Math.PI 
+         && floatVal<=2*Math.PI) {
+	      waveObj.phi_slider.value=''+floatVal;
+	      waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
+        phiInput.style.backgroundColor='white';
+	      refreshWaves();
+      } else {
+        //Error: turn red.
+        phiInput.style.backgroundColor='#FF6666';
+      }
 	  }
   });
 
