@@ -719,7 +719,7 @@ createWaveEqn = function(waveObj) {
   
   var sin_txt = document.createTextNode('sin( ');
   eqn.appendChild(sin_txt);
-  var two_pi = document.createTextNode('2\u03C0/');
+  var two_pi = document.createTextNode('2\u03C0/(');
   eqn.appendChild(two_pi);
 
 
