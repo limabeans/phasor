@@ -466,6 +466,8 @@ clearButton.addEventListener('click', function() {
   clearEverything();
   maybeDisablePlayButton();
   enableButtons();
+  //Clear import button
+  clearImportButton();
 });
 var clearEverything = function() {
   for(var i=0; i<wavesArray.length; i++) {
@@ -629,6 +631,11 @@ importButton.addEventListener('change', function(e) {
   };
   reader.readAsText(file);
 });
+
+var clearImportButton = function() {
+  importButton.value="";
+};
+
 
 var exportButton = document.getElementById('export_waves');
 exportButton.addEventListener('click', function() {
