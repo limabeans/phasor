@@ -844,19 +844,17 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.amplitude=a_slider.value;
     waveObj.amp_input.value = a_slider.value;
 	  waveObj.refresh();
-
-
 	  refreshWaves();
+
+    //Turn off red amp_input.
+    waveObj.amp_input.style.backgroundColor='white';
   });
   sliders.appendChild(a_slider);
   waveObj.amp_slider = a_slider;
-
   sliders.appendChild(minispace);
-
   var num_frequency_span = document.createElement('span');
   num_frequency_span.innerHTML = 'f';
   sliders.appendChild(num_frequency_span);
-
   sliders.appendChild(minispace);
 
   var frequency_slider = document.createElement('input');
@@ -872,7 +870,6 @@ createWaveSlidersDOM = function(waveObj) {
       var delta = parseFloat(waveObj.f_slider.value)-waveObj.frequency;
       for(var i = 0; i < wavesArray.length; i++) {
         var new_freq = delta + parseFloat(wavesArray[i].f_slider.value);
-        
         if(new_freq>15) { new_freq = 15; }
         if(new_freq<0.5) { new_freq = 0.5; }
         if(waveObj.arrayIndex!=i) {
@@ -904,17 +901,17 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.edit(waveObj.amplitude, frequency_slider.value, waveObj.phi,phasorOriginPoint);
 
 	  refreshWaves();
-  });
 
+    //Turn off red f_input.
+    waveObj.f_input.style.backgroundColor='white';
+  });
 
   sliders.appendChild(frequency_slider);
   sliders.appendChild(minispace);
 
-
   var phi = document.createElement('span');
   phi.innerHTML='&phi;';
   sliders.appendChild(phi);
-
   var phi_slider = document.createElement('input');
   phi_slider.type='range';
   phi_slider.className='sliders';
@@ -946,7 +943,6 @@ createWaveSlidersDOM = function(waveObj) {
           //Edit textual phi input.
 	        wavesArray[i].phi_input.value=''+scaleByPi;
 	        wavesArray[i].edit(wavesArray[i].amplitude,wavesArray[i].frequency, parseFloat(wavesArray[i].phi), phasorOriginPoint);
-          console.log(wavesArray[i].phi);
         }
       }
     }
@@ -959,6 +955,9 @@ createWaveSlidersDOM = function(waveObj) {
 	  waveObj.edit(waveObj.amplitude,waveObj.frequency, parseFloat(phi_slider.value), phasorOriginPoint);
 
 	  refreshWaves();
+
+    //Turn off red phi_input.
+    waveObj.phi_input.style.backgroundColor='white';
   });
 
   return sliders;
