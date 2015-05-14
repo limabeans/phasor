@@ -33,7 +33,12 @@ var tails_at_origin=true;
 var showIndividual=true;
 var showResultant=true;
 var setIntervalInitialized=false;
-var setIntervalVariable = null;
+var setIntervalVariable=null;
+
+//Don't allow to [play] unless everything is okay.
+var a_values_okay=true;
+var f_values_okay=true;
+var phi_values_okay=true;
 
 var a_locked = false;
 var a_lock_checkbox = document.getElementById('lock_a');
@@ -447,17 +452,21 @@ var enablePlayButton = function() {
   playButton.disabled=false;  
 };
 playButton.addEventListener('click', function() {
-  play=!play;
-  if(!play) { //Pause.
-	  clearInterval(setIntervalVariable);
-	  setIntervalInitialized=false;
-  }
-  if(playButton.innerHTML === 'Play') {
-	  playButton.innerHTML = 'Pause';
+  if(a_values_okay && f_values_okay && phi_values_okay) {
+    play=!play;
+    if(!play) { //Pause.
+	    clearInterval(setIntervalVariable);
+	    setIntervalInitialized=false;
+    }
+    if(playButton.innerHTML === 'Play') {
+	    playButton.innerHTML = 'Pause';
+    } else {
+	    playButton.innerHTML = 'Play';
+    }
+    disablePhi();
   } else {
-	  playButton.innerHTML = 'Play';
+    alert('Your wave(s) have incorrect values!');
   }
-  disablePhi();
 });
 maybeDisablePlayButton();
 //Button #2. CLEAR button.
@@ -708,11 +717,16 @@ createWaveEqn = function(waveObj) {
         waveObj.amp_slider.value=''+floatVal;
         waveObj.edit(floatVal, waveObj.frequency, 
                      waveObj.phi, phasorOriginPoint);
+        
+        //Visual show that a_value is okay.
+        a_values_okay=true;
         amplInput.style.backgroundColor='white';
+
         refreshWaves();
       } else {
         //Error: turn red.
         amplInput.style.backgroundColor='#FF6666';
+        a_values_okay=false;
       }
     }
   });
@@ -768,10 +782,16 @@ createWaveEqn = function(waveObj) {
 	      waveObj.omega = omega;
 	      waveObj.edit(waveObj.amplitude, floatVal,
                      waveObj.phi,phasorOriginPoint);
+
+        //Visual show that f values are okay.
         fInput.style.backgroundColor='white';
+        f_values_okay=true;
+
 	      refreshWaves();
       } else {
+        //Error: red.
         fInput.style.backgroundColor='#FF6666';
+        f_values_okay=false;
       }
     }
   });
@@ -789,16 +809,22 @@ createWaveEqn = function(waveObj) {
   phiInput.addEventListener('keydown', function() {
 	  //[enter] 
 	  if(event.keyCode == 13) {
-	    var floatVal = eval(phiInput.value)*Math.PI;
-      if(!isNaN(floatVal) && floatVal>=-2*Math.PI 
-         && floatVal<=2*Math.PI) {
-	      waveObj.phi_slider.value=''+floatVal;
-	      waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
-        phiInput.style.backgroundColor='white';
-	      refreshWaves();
+      if(!isNaN(parseFloat(phiInput.value))) {
+	      var floatVal = eval(phiInput.value)*Math.PI;
+        if(floatVal>=-2*Math.PI && floatVal<=2*Math.PI) {
+	        waveObj.phi_slider.value=''+floatVal;
+	        waveObj.edit(waveObj.amplitude,waveObj.frequency, floatVal, phasorOriginPoint);
+
+          //Visual show that phi is okay.
+          phiInput.style.backgroundColor='white';
+          phi_values_okay=true;
+
+	        refreshWaves();
+        }
       } else {
         //Error: turn red.
         phiInput.style.backgroundColor='#FF6666';
+        phi_values_okay=false;
       }
 	  }
   });
