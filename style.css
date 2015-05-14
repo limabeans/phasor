@@ -95,11 +95,6 @@ td, th {
     width: 20px;
 }
 
-#footer {
-    position:absolute;
-    bottom:0;
-}
-
 h1 {
     font-family: "Courier New";
     font-size: 60px;
