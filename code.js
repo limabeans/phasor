@@ -175,6 +175,8 @@ var refreshWaveDiv = function() {
 };
 
 
+
+
 //Wave constructor.
 function Wave(a,k,omega,phi,color,d) {
   //DOM element reference variables.
@@ -1013,6 +1015,8 @@ createWaveDOM = function(waveObj) {
 	  refreshWaveDiv();
 	  refreshResultant();
     maybeDisablePlayButton();
+    recheckWaveInputs();
+
   });
   var space = document.createElement('span');
   space.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -1092,3 +1096,33 @@ var enableButtons = function() {
   f_lock_checkbox.disabled=false;
 };
 
+
+var recheckWaveInputs = function() {
+  if(check_if_okay) {
+    a_values_okay=true;
+    f_values_okay=true;
+    phi_values_okay=true;
+  }
+};
+
+var check_if_okay = function() {
+  for(var i = 0; i < wavesArray.length; i++) {
+    if(!checkWave) {
+      return false;
+    }
+  }
+  return true;
+};
+
+
+var checkWave = function(wave) {
+  if (wave.amplitude < 0 || wave.amplitude > 2) {
+    return false;
+  } else if (wave.omega < .5 || wave.omega > 15) {
+    return false; 
+  } else if (wave.phi < -6.283185307179586 || 
+             wave.phi > 6.283185307179586) {
+    return false;  
+  }
+  return true;
+};
