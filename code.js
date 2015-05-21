@@ -479,6 +479,7 @@ clearButton.addEventListener('click', function() {
   enableButtons();
   //Clear import button
   clearImportButton();
+  recheckWaveInputs();
 });
 var clearEverything = function() {
   for(var i=0; i<wavesArray.length; i++) {
