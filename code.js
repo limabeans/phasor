@@ -8,6 +8,10 @@ canvas.width=.7*document.body.clientWidth;
 canvas.height=.7*document.body.clientHeight;
 
 var MAX_NUMBER_OF_WAVES = 10;
+// set timer to disabled by default
+var timer_disabled = true;
+var timer_area = document.getElementById('timer_area');
+timer_area.style.visibility = 'hidden';
 
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
@@ -123,7 +127,7 @@ var resetTimeElapsed = function() {
   currentTime=0;
   clearInterval(setIntervalVariable);
   setIntervalInitialized=false;
-  time_elapsed.innerHTML='0';
+  time_elapsed.innerHTML='0.0';
 };
 
 //Divs.
@@ -337,10 +341,11 @@ function onFrame(event) {
 
 function set_interval_timing() {
   setIntervalVariable = setInterval(function() {
-		currentTime+=.1;
+		// currentTime+=.1;
+    currentTime+=.00625; // some magic number .1 / 16
 		time_elapsed.innerHTML=''+currentTime.toFixed(1);
 	}, (100/speedSlider.value));
-  // 1000ms / speedSlider factor
+  // 100ms / speedSlider factor
 	setIntervalInitialized=true;
 };
 
@@ -545,6 +550,23 @@ var addWave = function() {
     enablePlayButton();
   }
 };
+
+var toggle_timer_button = document.getElementById('toggle_timer');
+toggle_timer_button.addEventListener('click', function() {
+  toggle_timer();
+});
+
+//Button #6. Toggle Timer
+var toggle_timer = function() {
+  if (timer_disabled) {
+    timer_area.style.visibility = 'visible';
+  } else {
+    timer_area.style.visibility = 'hidden';
+  }
+  timer_disabled = !timer_disabled;
+};
+
+
 
 var addCustomWave = function(ampl,k,omega,phi,color,dir) {
   if(wavesArray.length<MAX_NUMBER_OF_WAVES) {
