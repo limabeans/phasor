@@ -126,16 +126,6 @@ var resetTimeElapsed = function() {
   time_elapsed.innerHTML='0';
 };
 
-var incrementTimeElapsed = function(timeStep) {
-  var scaledTime = .1;
-  currentTime+=scaledTime;
-  if(currentTime%1===0) {
-	  var textTime = ''+parseFloat(currentTime).toFixed(0);
-	  time_elapsed.innerHTML=textTime;
-  }
-};
-
-
 //Divs.
 var createTable = function() {
   var table = document.createElement('table');
@@ -331,12 +321,9 @@ function onFrame(event) {
   if(play) {
 	  disableButtons();
 	  if(!setIntervalInitialized) {
+      // timer code
 	    if(speedSlider.value!=='0') {
-		    setIntervalVariable = setInterval(function() {
-		      currentTime+=1;
-		      time_elapsed.innerHTML=''+currentTime;
-		    }, 1000/speedSlider.value);
-		    setIntervalInitialized=true;
+		    set_interval_timing();
 	    }
 	  }
 	  refreshWaves();
@@ -346,6 +333,15 @@ function onFrame(event) {
   } else {
 	  enableButtons();
   }
+};
+
+function set_interval_timing() {
+  setIntervalVariable = setInterval(function() {
+		currentTime+=.1;
+		time_elapsed.innerHTML=''+currentTime.toFixed(1);
+	}, (100/speedSlider.value));
+  // 1000ms / speedSlider factor
+	setIntervalInitialized=true;
 };
 
 refreshWaves = function() {
@@ -574,14 +570,11 @@ speedSlider.addEventListener('input', function() {
   timeStep=speedVal/1000;
   //Modifying the timer on the screen.
   if(play) {
+    // timer code
 	  clearInterval(setIntervalVariable);
 	  if(speedVal!==0) {
-	    setIntervalVariable = setInterval(function() {
-		    currentTime+=1;
-		    time_elapsed.innerHTML=''+currentTime;
-	    }, 1000/speedVal);
-	    setIntervalInitialized=true;
-	  }
+      set_interval_timing();
+    }
   }
 });
 
