@@ -10,8 +10,8 @@ canvas.height=.7*document.body.clientHeight;
 var MAX_NUMBER_OF_WAVES = 10;
 // set timer to disabled by default
 var timer_disabled = true;
-var timer_area = document.getElementById('timer_area');
-timer_area.style.visibility = 'hidden';
+//var timer_area = document.getElementById('timer_area');
+//timer_area.style.visibility = 'hidden';
 
 var zeroX = canvas.height;
 var zeroY = canvas.height/2;
@@ -121,14 +121,14 @@ var DEFAULT_DIR = '-';
 
 
 //Handling the timer.
-var time_elapsed = document.getElementById('time_elapsed');
+//var time_elapsed = document.getElementById('time_elapsed');
 
-var resetTimeElapsed = function() {
-  currentTime=0;
-  clearInterval(setIntervalVariable);
-  setIntervalInitialized=false;
-  time_elapsed.innerHTML='0.0';
-};
+// var resetTimeElapsed = function() {
+//   currentTime=0;
+//   clearInterval(setIntervalVariable);
+//   setIntervalInitialized=false;
+//   time_elapsed.innerHTML='0.0';
+// };
 
 //Divs.
 var createTable = function() {
@@ -324,12 +324,12 @@ function Wave(a,k,omega,phi,color,d) {
 function onFrame(event) {
   if(play) {
 	  disableButtons();
-	  if(!setIntervalInitialized) {
+	  //if(!setIntervalInitialized) {
       // timer code
-	    if(speedSlider.value!=='0') {
-		    set_interval_timing();
-	    }
-	  }
+	    // if(speedSlider.value!=='0') {
+	    // 	    set_interval_timing();
+	    // }
+	  //}
 	  refreshWaves();
 	  if(showResultant) {
 	    refreshResultant();
@@ -339,15 +339,15 @@ function onFrame(event) {
   }
 };
 
-function set_interval_timing() {
-  setIntervalVariable = setInterval(function() {
-		// currentTime+=.1;
-    currentTime+=.00625; // some magic number .1 / 16
-		time_elapsed.innerHTML=''+currentTime.toFixed(1);
-	}, (100/speedSlider.value));
-  // 100ms / speedSlider factor
-	setIntervalInitialized=true;
-};
+// function set_interval_timing() {
+//   setIntervalVariable = setInterval(function() {
+// 		// currentTime+=.1;
+//     currentTime+=.00625; // some magic number .1 / 16
+// 		//time_elapsed.innerHTML=''+currentTime.toFixed(1);
+// 	}, (100/speedSlider.value));
+//   // 100ms / speedSlider factor
+// 	setIntervalInitialized=true;
+// };
 
 refreshWaves = function() {
   //This iterates through the wavesArray and dynamically updates/redraws 
@@ -551,20 +551,20 @@ var addWave = function() {
   }
 };
 
-var toggle_timer_button = document.getElementById('toggle_timer');
-toggle_timer_button.addEventListener('click', function() {
-  toggle_timer();
-});
+// var toggle_timer_button = document.getElementById('toggle_timer');
+// toggle_timer_button.addEventListener('click', function() {
+//   toggle_timer();
+// });
 
-//Button #6. Toggle Timer
-var toggle_timer = function() {
-  if (timer_disabled) {
-    timer_area.style.visibility = 'visible';
-  } else {
-    timer_area.style.visibility = 'hidden';
-  }
-  timer_disabled = !timer_disabled;
-};
+// //Button #6. Toggle Timer
+// var toggle_timer = function() {
+//   if (timer_disabled) {
+//     timer_area.style.visibility = 'visible';
+//   } else {
+//     timer_area.style.visibility = 'hidden';
+//   }
+//   timer_disabled = !timer_disabled;
+// };
 
 
 
@@ -589,15 +589,15 @@ speedSlider.addEventListener('input', function() {
   speed_val.innerHTML=''+scaled;
   speedVal = parseFloat(speedVal);
   //Scale the timeStep downwards.
-  timeStep=speedVal/1000;
-  //Modifying the timer on the screen.
-  if(play) {
-    // timer code
-	  clearInterval(setIntervalVariable);
-	  if(speedVal!==0) {
-      set_interval_timing();
-    }
-  }
+  // timeStep=speedVal/1000;
+  // //Modifying the timer on the screen.
+  // if(play) {
+  //   // timer code
+  // 	  clearInterval(setIntervalVariable);
+  // 	  if(speedVal!==0) {
+  //     set_interval_timing();
+  //   }
+  // }
 });
 
 var phasorTailsSelector = document.getElementById('phasor_tails');
