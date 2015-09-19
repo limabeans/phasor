@@ -589,16 +589,16 @@ speedSlider.addEventListener('input', function() {
   var scaled = parseFloat(speedVal).toFixed(3);
   speed_val.innerHTML=''+scaled;
   speedVal = parseFloat(speedVal);
-  //Scale the timeStep downwards.
-  // timeStep=speedVal/1000;
-  // //Modifying the timer on the screen.
-  // if(play) {
-  //   // timer code
-  // 	  clearInterval(setIntervalVariable);
-  // 	  if(speedVal!==0) {
-  //     set_interval_timing();
-  //   }
-  // }
+  // Scale the timeStep downwards.
+  timeStep=speedVal/1000;
+  //Modifying the timer on the screen.
+  if(play) {
+    // timer code
+  	  clearInterval(setIntervalVariable);
+  	  if(speedVal!==0) {
+      set_interval_timing();
+    }
+  }
 });
 
 var phasorTailsSelector = document.getElementById('phasor_tails');
