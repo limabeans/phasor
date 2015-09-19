@@ -123,12 +123,12 @@ var DEFAULT_DIR = '-';
 //Handling the timer.
 //var time_elapsed = document.getElementById('time_elapsed');
 
-// var resetTimeElapsed = function() {
-//   currentTime=0;
-//   clearInterval(setIntervalVariable);
-//   setIntervalInitialized=false;
-//   time_elapsed.innerHTML='0.0';
-// };
+var resetTimeElapsed = function() {
+  currentTime=0;
+  clearInterval(setIntervalVariable);
+  setIntervalInitialized=false;
+  //time_elapsed.innerHTML='0.0';
+};
 
 //Divs.
 var createTable = function() {
@@ -339,15 +339,16 @@ function onFrame(event) {
   }
 };
 
-// function set_interval_timing() {
-//   setIntervalVariable = setInterval(function() {
-// 		// currentTime+=.1;
-//     currentTime+=.00625; // some magic number .1 / 16
-// 		//time_elapsed.innerHTML=''+currentTime.toFixed(1);
-// 	}, (100/speedSlider.value));
-//   // 100ms / speedSlider factor
-// 	setIntervalInitialized=true;
-// };
+function set_interval_timing() {
+  setIntervalVariable = setInterval(function() {
+		// currentTime+=.1;
+    currentTime+=.00625; // some magic number .1 / 16
+		//time_elapsed.innerHTML=''+currentTime.toFixed(1);
+	}, (100/speedSlider.value));
+  // 100ms / speedSlider factor
+	setIntervalInitialized=true;
+};
+
 
 refreshWaves = function() {
   //This iterates through the wavesArray and dynamically updates/redraws 
@@ -551,10 +552,10 @@ var addWave = function() {
   }
 };
 
-// var toggle_timer_button = document.getElementById('toggle_timer');
-// toggle_timer_button.addEventListener('click', function() {
-//   toggle_timer();
-// });
+//var toggle_timer_button = document.getElementById('toggle_timer');
+//toggle_timer_button.addEventListener('click', function() {
+  //toggle_timer();
+//});
 
 // //Button #6. Toggle Timer
 // var toggle_timer = function() {
